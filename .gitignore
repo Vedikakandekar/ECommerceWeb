@@ -1,0 +1,55 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# ASP.NET Core
+project.lock.json
+project.fragment.lock.json
+*.nupkg
+*.snupkg
+
+# Runtime and tool-specific
+*.db
+*.db-journal
+*.log
+*.log.* 
+*.dSYM/
+*.pdb
+*.cache
+*.mp4
+*.mp3
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Core 2.0 and later
+**/Properties/launchSettings.json
+
+# Ignore any files containing sensitive information
+**/appsettings*.json
+
+# Others
+*.sln.ide
+
+# Ignore temporary files
+*.tmp
+*.temp
+*.bak
+*.swp

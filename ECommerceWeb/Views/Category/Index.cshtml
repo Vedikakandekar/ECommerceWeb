@@ -1,0 +1,86 @@
+﻿@model List<Category>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Categories</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .category-card {
+            transition: transform 0.3s ease-in-out;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+     <header class="bg-primary text-white text-center py-5">
+        <h1 class="display-4">Shop by Category</h1>
+        <p class="lead">Discover our wide range of products</p>
+    </header>
+
+     <div class="container">
+         <div class="row pt-4 pb-3">
+             <div class="col-6">
+
+                 <h1> Categories </h1>
+
+     </div>
+
+
+
+        <div class="col-6 text-end">
+            <a asp-controller="Category" asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>  Create New Category
+            </a>
+        </div>
+    </div>
+
+
+    <main class="container my-5">
+
+        <div class="row g-4">
+              @foreach (var o in Model)
+          {
+            <div class="col-md-4 col-sm-6">
+                
+        
+                <div class="card category-card h-100">
+                    <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Img">
+                    <div class="card-body">
+                        <h5 class="card-title">@o.Name</h5>
+                        <p class="card-text">@o.Description</p>
+                        <a href="#" class="btn btn-primary">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+          }
+            </div>
+            </main>
+   
+
+   @*  <table class="table table-striped">
+
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+
+                    <td>@o.Id</td>
+                    <td>@o.Name</td>
+                </tr>
+            }
+        </tbody>
+
+
+    </table> *@
+
+</body>
+</html>
