@@ -2,8 +2,6 @@
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace ECommerceWeb.Migrations
 {
     /// <inheritdoc />
@@ -46,7 +44,7 @@ namespace ECommerceWeb.Migrations
 
             migrationBuilder.InsertData(
                 table: "Category",
-                columns: new[] { "Id", "Description", "Name" },
+                columns: ["Id", "Description", "Name"],
                 values: new object[,]
                 {
                     { 1, "Explore the Clothing Section curated exclusively for Men..", "Clothing-Mens" },

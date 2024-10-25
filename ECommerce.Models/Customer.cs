@@ -1,20 +1,20 @@
-﻿namespace ECommerceWeb.Models
+﻿namespace ECommerce.Models
 {
     public class Customer : User
     {
 
-        public List<string> notifications { get; set; }
+        public List<string> Notifications { get; set; }
         public Customer() { }
 
         public Customer(int id, string name, string email, string password, string phoneNumber)
         {
-            this.Email = email;
-            this.UserId = id;
-            this.Name = name;
-            this.Password = password;
-            this.PhoneNumber = phoneNumber;
-            this.Role = "Customer";
-            notifications = new List<string>();
+            Email = email;
+            UserId = id;
+            Name = name;
+            Password = password;
+            PhoneNumber = phoneNumber;
+            Role = "Customer";
+            Notifications = [];
         }
 
         public override string ToString()

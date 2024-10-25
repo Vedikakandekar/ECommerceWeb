@@ -1,4 +1,4 @@
-﻿namespace ECommerceWeb.Models
+﻿namespace ECommerce.Models
 {
     public class Seller : User
     {
@@ -6,12 +6,12 @@
 
         public Seller(int id, string name, string email, string password, string phone)
         {
-            this.Email = email;
-            this.UserId = id;
-            this.Name = name;
-            this.Password = password;
+            Email = email;
+            UserId = id;
+            Name = name;
+            Password = password;
             Role = "Seller";
-            this.PhoneNumber = phone;
+            PhoneNumber = phone;
         }
 
         public override string ToString()
