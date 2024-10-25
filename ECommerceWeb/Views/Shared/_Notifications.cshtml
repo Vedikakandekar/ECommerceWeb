@@ -1,0 +1,22 @@
+﻿<script>
+
+    function showPopup(msg)
+    {
+        alert(msg);
+    }
+
+</script>
+
+@if (TempData["success"] != null)
+{
+    <script>
+        showPopup("@TempData["success"]");
+    </script>
+}
+
+@if (TempData["error"] != null)
+{
+    <script>
+        showPopup("@TempData["error"]");
+    </script>
+}

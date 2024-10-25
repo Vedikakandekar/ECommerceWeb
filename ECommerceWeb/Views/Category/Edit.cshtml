@@ -1,33 +1,35 @@
-﻿
-@model Category
+﻿@model Category
 
 <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Create Category</title>
+<html>
+<head>
+    <title>Edit Category</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        
+</head>
+<body>
+
 
     <main class="container my-5">
         <h1 class="mb-4">Create New Category</h1>
         <form method="post">
-     
+
+
+            <input asp-for="Id" hidden />
             <div class="mb-3">
                 <label asp-for="Name" class="form-label">Category Name</label>
-                <input type="text" class="form-control" asp-for="Name"  required>
+                <input type="text" class="form-control" asp-for="Name" required>
             </div>
             <div class="mb-3">
                 <label asp-for="Description" class="form-label">Category Description</label>
-                <textarea class="form-control" asp-for="Description"  rows="3" required></textarea>
+                <textarea class="form-control" asp-for="Description" rows="3" required></textarea>
             </div>
-       
+
             <div class="mb-3">
-                <button type="submit" class="btn btn-primary" >Create Category</button>
+                <button type="submit" class="btn btn-primary">Update Category</button>
                 <a asp-controller="Category" asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
             </div>
         </form>
+
 
         @section Scripts {
             @{
@@ -35,7 +37,7 @@
             }
         }
     </main>
-      
 
-    </body>
-    </html>
+
+</body>
+</html>

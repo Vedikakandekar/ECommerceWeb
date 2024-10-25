@@ -53,3 +53,5 @@ project.fragment.lock.json
 *.temp
 *.bak
 *.swp
+
+.gitignore
