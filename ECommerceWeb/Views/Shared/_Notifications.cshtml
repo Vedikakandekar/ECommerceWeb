@@ -1,22 +1,22 @@
-﻿<script>
-
-    function showPopup(msg)
-    {
-        alert(msg);
-    }
-
-</script>
+﻿
 
 @if (TempData["success"] != null)
 {
-    <script>
-        showPopup("@TempData["success"]");
+
+   
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.success('@TempData["success"]');
     </script>
 }
 
 @if (TempData["error"] != null)
 {
-    <script>
-        showPopup("@TempData["error"]");
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.error('@TempData["error"]');
     </script>
 }
