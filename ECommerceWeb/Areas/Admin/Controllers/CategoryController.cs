@@ -4,8 +4,9 @@ using ECommerce.Data;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Data.Repository.IRepository;
 
-namespace ECommerceWeb.Controllers
+namespace ECommerceWeb.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController(IUnitOfWork unitOfWork) : Controller
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
@@ -75,20 +76,20 @@ namespace ECommerceWeb.Controllers
             {
                 return View("Error");
             }
-                Category category = unitOfWork.Category.Get(u=>u.Id==id)!;
-                if (category != null)
-                {
-                    return View(category);
-                }
-                else
-                    return NotFound();
+            Category category = unitOfWork.Category.Get(u => u.Id == id)!;
+            if (category != null)
+            {
+                return View(category);
+            }
+            else
+                return NotFound();
         }
 
 
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
-            Category? c = unitOfWork.Category.Get(u=>u.Id==id);
+            Category? c = unitOfWork.Category.Get(u => u.Id == id);
             if (c == null)
             {
                 return NotFound();
