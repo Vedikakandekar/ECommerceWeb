@@ -22,9 +22,4 @@
     <ProjectReference Include="..\ECommerceData\ECommerce.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Areas\Seller\Controllers\" />
-    <Folder Include="Areas\Seller\Views\" />
-  </ItemGroup>
-
 </Project>

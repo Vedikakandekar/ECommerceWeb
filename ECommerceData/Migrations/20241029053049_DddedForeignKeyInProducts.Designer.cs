@@ -3,6 +3,7 @@ using ECommerce.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerceWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241029053049_DddedForeignKeyInProducts")]
+    partial class DddedForeignKeyInProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,10 +86,6 @@ namespace ECommerceWeb.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -109,7 +108,6 @@ namespace ECommerceWeb.Migrations
                             Id = 1,
                             CategoryId = 4,
                             Description = "60Inch",
-                            ImageUrl = "",
                             Name = "TV",
                             Price = 50000.0,
                             stock = 10
@@ -119,7 +117,6 @@ namespace ECommerceWeb.Migrations
                             Id = 2,
                             CategoryId = 4,
                             Description = "i10",
-                            ImageUrl = "",
                             Name = "Laptop",
                             Price = 50000.0,
                             stock = 20
@@ -129,7 +126,6 @@ namespace ECommerceWeb.Migrations
                             Id = 3,
                             CategoryId = 1,
                             Description = "Black Tshirt",
-                            ImageUrl = "",
                             Name = "TShirt",
                             Price = 1000.0,
                             stock = 100

@@ -1,4 +1,4 @@
-﻿@model List<Category>
+﻿@model List<Products>
 <partial name="_Notifications" />
 <!DOCTYPE html>
 <html>
@@ -6,10 +6,10 @@
     <title>Categories</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        .category-card {
+        .Product-card {
             transition: transform 0.3s ease-in-out;
         }
-        .category-card:hover {
+        .Product-card:hover {
             transform: translateY(-5px);
         }
         .card-icons {
@@ -37,23 +37,23 @@
 
    
     <header class="bg-primary text-white text-center py-5">
-        <h1 class="display-4">Shop by Category</h1>
-        <p class="lead">Discover our wide range of products</p>
+        <h1 class="display-4">Your Products</h1>
+        <p class="lead">Manage your Products here..</p>
     </header>
 
      <div class="container">
          <div class="row pt-4 pb-3">
              <div class="col-6">
 
-                 <h1> Categories </h1>
+                 <h1> Products </h1>
 
      </div>
 
 
 
         <div class="col-6 text-end">
-            <a asp-controller="Category" asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i>  Create New Category
+            <a asp-controller="Product" asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>  Add New Product
             </a>
         </div>
     </div>
@@ -65,26 +65,24 @@
               @foreach (var o in Model)
           {
             <div class="col-md-4 col-sm-6">
-                <div class="card category-card h-100">
+                <div class="card Product-card h-100">
                         <div class="card-icons ">
-                            <a asp-controller="Category" asp-action="Edit" asp-route-id="@o.Id"> <i class="bi bi-pencil-fill text-primary"></i> </a>
-                                <a asp-controller="Category" asp-action="Delete" asp-route-id="@o.Id"> <i class="bi bi-trash3-fill text-danger"></i> </a>
+                            <a asp-controller="Product" asp-action="Edit" asp-route-id="@o.Id"> <i class="bi bi-pencil-fill text-primary"></i> </a>
+                                <a asp-controller="Product" asp-action="Delete" asp-route-id="@o.Id"> <i class="bi bi-trash3-fill text-danger"></i> </a>
                         </div>
                     <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Img">
                     <div class="card-body">
                         <h5 class="card-title">@o.Name</h5>
+                                <h4 class="card-subtitle mb-2 text-body-secondary">Cost : @o.Price</h4>
+                                <h4 class="card-subtitle mb-2 text-body-secondary">In stock : @o.stock</h4>
                         <p class="card-text">@o.Description</p>
-                        <a href="#" class="btn btn-primary">Shop Now</a>
                     </div>
                 </div>
             </div>
           }
             </div>
             </main>
-   
 </div>
-
- 
 
 </body>
 </html>

@@ -3,6 +3,7 @@ using ECommerce.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerceWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241028101039_AddedProductTable")]
+    partial class AddedProductTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,12 +62,6 @@ namespace ECommerceWeb.Migrations
                             Id = 3,
                             Description = "No Space but a lot of things ? Explore Storage section to make Living spacious..",
                             Name = "Storage"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "All Your Electric stuff goes here...check out latest innovations ..",
-                            Name = "Electronics"
                         });
                 });
 
@@ -76,14 +73,7 @@ namespace ECommerceWeb.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -99,17 +89,13 @@ namespace ECommerceWeb.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("Product");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CategoryId = 4,
                             Description = "60Inch",
-                            ImageUrl = "",
                             Name = "TV",
                             Price = 50000.0,
                             stock = 10
@@ -117,9 +103,7 @@ namespace ECommerceWeb.Migrations
                         new
                         {
                             Id = 2,
-                            CategoryId = 4,
                             Description = "i10",
-                            ImageUrl = "",
                             Name = "Laptop",
                             Price = 50000.0,
                             stock = 20
@@ -127,9 +111,7 @@ namespace ECommerceWeb.Migrations
                         new
                         {
                             Id = 3,
-                            CategoryId = 1,
                             Description = "Black Tshirt",
-                            ImageUrl = "",
                             Name = "TShirt",
                             Price = 1000.0,
                             stock = 100
@@ -197,17 +179,6 @@ namespace ECommerceWeb.Migrations
                     b.HasBaseType("ECommerce.Models.User");
 
                     b.HasDiscriminator().HasValue("Seller");
-                });
-
-            modelBuilder.Entity("ECommerce.Models.Products", b =>
-                {
-                    b.HasOne("ECommerce.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }

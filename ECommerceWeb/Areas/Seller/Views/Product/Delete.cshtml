@@ -1,0 +1,55 @@
+﻿@model ProductVM
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Product</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+
+    <main class="container my-5">
+        <h1 class="mb-4">Delete Product</h1>
+        <form method="post" enctype="multipart/form-data">
+
+
+            <input asp-for="Products.Id" hidden />
+            <div class="mb-3">
+                <label asp-for="Products.Name" class="form-label">Product Name</label>
+                <input type="text" disabled class="form-control" asp-for="Products.Name" required>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Products.Description" class="form-label">Product Description</label>
+                <textarea class="form-control" disabled asp-for="Products.Description" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Products.Price" class="form-label">Product Cost</label>
+                <textarea class="form-control" disabled asp-for="Products.Price" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Products.stock" class="form-label">Product In Stock</label>
+                <textarea class="form-control" disabled asp-for="Products.stock" rows="3" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Products.ImageUrl" class="form-label">Add Picture</label>
+                <textarea class="form-control" asp-for="Products.ImageUrl" rows="3" required></textarea>
+                </di>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Delete Product</button>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+        </form>
+
+
+        @section Scripts {
+            @{
+                <partial name="_ValidationScriptsPartial" />
+            }
+        }
+    </main>
+
+
+</body>
+</html>
