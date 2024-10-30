@@ -3,6 +3,7 @@ using ECommerce.Models;
 using ECommerce.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
+using ECommerce.Data.Repository;
 
 namespace ECommerceWeb.Areas.Seller.Controllers
 {
@@ -15,7 +16,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             List<Products> categories = unitOfWork.Product.GetAll().ToList();
             return View(categories);
         }
-        public IActionResult Create()
+        public IActionResult Upsert(int? id)
         {
             ProductVM productVM = new ProductVM()
             {
@@ -26,64 +27,46 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                 }),
                 Products = new Products()
             };
-            return View(productVM);
+            if (id == null || id==0)
+            {
+                
+                return View(productVM);
+            }
+            else
+            {
+                productVM.Products = unitOfWork.Product.Get(u => u.Id == id);
+                return View(productVM);
+            }
         }
 
         [HttpPost]
-        public IActionResult Create(ProductVM obj)
+        public IActionResult Upsert(ProductVM obj, IFormFile? file)
         {
-            
+
             if (ModelState.IsValid)
             {
-                unitOfWork.Product.Add(obj.Products);
-                unitOfWork.Save();
-                TempData["success"] = "Product Created Successfully";
-                return RedirectToAction("Index", "Product");
-            }
-            
-            return View("Error");
-        }
-
-
-        public IActionResult Edit(int? id)
-        {
-            if (id != null)
-            {
-                ProductVM productVM = new ProductVM()
+                if (obj.Products.Id==0)
                 {
-                    CategoryList = unitOfWork.Category.GetAll().ToList().Select(u => new SelectListItem
-                    {
-                        Text = u.Name,
-                        Value = u.Id.ToString()
-                    }),
-
-                    Products = unitOfWork.Product.Get(u => u.Id == id)!
-                };
-                if (productVM.Products != null)
-                {
-                    return View(productVM);
+                    unitOfWork.Product.Add(obj.Products);
+                    unitOfWork.Save();
+                    TempData["success"] = "Product Created Successfully";
+                    return RedirectToAction("Index", "Product");
                 }
                 else
-                    return NotFound();
+                {
+                    unitOfWork.Product.Update(obj.Products);
+                    unitOfWork.Save();
+                    TempData["success"] = "Product Updated Successfully";
+                    return RedirectToAction("Index", "Product");
+                }
             }
 
             return View("Error");
-
         }
 
-        [HttpPost]
-        public IActionResult Edit(ProductVM obj)
-        {
 
-            if (ModelState.IsValid)
-            {
-                unitOfWork.Product.Update(obj.Products);
-                unitOfWork.Save();
-                TempData["success"] = "product Updated Successfully";
-                return RedirectToAction("Index", "product");
-            }
-            return View("Error");
-        }
+       
+
 
 
 

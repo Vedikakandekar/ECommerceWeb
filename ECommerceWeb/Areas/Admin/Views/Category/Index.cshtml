@@ -52,9 +52,8 @@
 
 
         <div class="col-6 text-end">
-            <a asp-controller="Category" asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i>  Create New Category
-            </a>
+                <a asp-area="Admin" asp-controller="Category" asp-action="Upsert" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>  Create New Category </a>
         </div>
     </div>
 
@@ -67,8 +66,8 @@
             <div class="col-md-4 col-sm-6">
                 <div class="card category-card h-100">
                         <div class="card-icons ">
-                            <a asp-controller="Category" asp-action="Edit" asp-route-id="@o.Id"> <i class="bi bi-pencil-fill text-primary"></i> </a>
-                                <a asp-controller="Category" asp-action="Delete" asp-route-id="@o.Id"> <i class="bi bi-trash3-fill text-danger"></i> </a>
+                                <a asp-area="Admin" asp-controller="Category" asp-action="Upsert" asp-route-id="@o.Id"> <i class="bi bi-pencil-fill text-primary"></i> </a>
+                                <a asp-area="Admin" asp-controller="Category" asp-action="Delete" asp-route-id="@o.Id"> <i class="bi bi-trash3-fill text-danger"></i> </a>
                         </div>
                     <img src="/placeholder.svg?height=200&width=300" class="card-img-top" alt="Img">
                     <div class="card-body">

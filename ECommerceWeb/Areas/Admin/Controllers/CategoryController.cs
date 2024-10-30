@@ -17,29 +17,13 @@ namespace ECommerceWeb.Areas.Admin.Controllers
             return View(categories);
         }
 
-        public IActionResult Create()
+        public IActionResult Upsert(int? id)
         {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Create(Category obj)
-        {
-
-            if (ModelState.IsValid)
+            if (id == null || id == 0)
             {
-                unitOfWork.Category.Add(obj);
-                unitOfWork.Save();
-                TempData["success"] = "Category Created Successfully";
-                return RedirectToAction("Index", "Category");
+                return View(new Category());
             }
-            return View("Error");
-        }
-
-
-        public IActionResult Edit(int? id)
-        {
-            if (id != null)
+            else
             {
                 Category category = unitOfWork.Category.Get(u => u.Id == id)!;
                 if (category != null)
@@ -49,24 +33,35 @@ namespace ECommerceWeb.Areas.Admin.Controllers
                 else
                     return NotFound();
             }
-
-            return View("Error");
-
+           
         }
 
         [HttpPost]
-        public IActionResult Edit(Category obj)
+        public IActionResult Upsert(Category obj)
         {
 
             if (ModelState.IsValid)
             {
-                unitOfWork.Category.Update(obj);
-                unitOfWork.Save();
-                TempData["success"] = "Category Updated Successfully";
-                return RedirectToAction("Index", "Category");
+                if (obj.Id == 0)
+                {
+                    unitOfWork.Category.Add(obj);
+                    unitOfWork.Save();
+                    TempData["success"] = "Category Created Successfully";
+                    return RedirectToAction("Index", "Category");
+                }
+                else
+                {
+                    unitOfWork.Category.Update(obj);
+                    unitOfWork.Save();
+                    TempData["success"] = "Category Updated Successfully";
+                    return RedirectToAction("Index", "Category");
+                }
             }
             return View("Error");
         }
+
+
+      
 
 
 
