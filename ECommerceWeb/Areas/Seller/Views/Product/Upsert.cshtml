@@ -1,59 +1,79 @@
-﻿
-@model ProductVM
+﻿@model ProductVM
 
 <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Create Product</title>
+<html>
+<head>
+    <title>Create Product</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        
+</head>
+<body>
+
 
     <main class="container my-5">
         <h1 class="mb-4">@(Model.Products.Id != 0 ? "Update" : "Create New") Product</h1>
-        <form method="post" enctype="m">
+        <form method="post" enctype="multipart/form-data">
             <input type="text" class="form-control" asp-for="Products.Id" hidden required>
-            <div class="mb-3">
-                <label asp-for="Products.Name" class="form-label">Product Name</label>
-                <input type="text" class="form-control" asp-for="Products.Name" required>
+            <input asp-for="Products.ImageUrl" hidden />
+            <div class="row">
+                <div class="col-10">
+
+
+                    <div class="col-2">
+                        <img src="@Model.Products.ImageUrl" width="100%"
+                             style="border-radius:5px; border:1px solid #bbb9b9" />
+
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Products.Name" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" asp-for="Products.Name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Products.Description" class="form-label">Product Description</label>
+                        <textarea class="form-control" asp-for="Products.Description" rows="3" required></textarea>
+                    </div>
+                    <select asp-for="@Model.Products.CategoryId" asp-items="@Model.CategoryList" class="form-select">
+                        <option>--Select Category--</option>
+                    </select>
+                    <div class="mb-3">
+                        <label asp-for="Products.Price" class="form-label">Product Cost</label>
+                        <textarea class="form-control" asp-for="Products.Price" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Products.stock" class="form-label">Product In Stock</label>
+                        <textarea class="form-control" asp-for="Products.stock" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Add Picture</label>
+                        <input type="file"  name="file" class="form-control" rows="3" />
+                    </div>
+
+
+
+
+
+                    <div class="mb-3">
+
+                        @if (Model.Products.Id != 0)
+                        {
+                            <button type="submit" class="btn btn-primary ">Update</button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary ">Add</button>
+                        }
+
+                        <a asp-controller="Product" asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Products.Description" class="form-label">Product Description</label>
-                <textarea class="form-control" asp-for="Products.Description" rows="3" required></textarea>
-            </div>
-            <select asp-for="@Model.Products.CategoryId" asp-items="@Model.CategoryList" class="form-select">
-                <option>--Select Category--</option>
-            </select>
-            <div class="mb-3">
-                <label asp-for="Products.Price" class="form-label">Product Cost</label>
-                <textarea class="form-control" asp-for="Products.Price" rows="3" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Products.stock" class="form-label">Product In Stock</label>
-                <textarea class="form-control" asp-for="Products.stock" rows="3" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Products.ImageUrl" class="form-label">Add Picture</label>
-                <input class="form-control" asp-for="Products.ImageUrl" rows="3" required></input>
-            </div>
-       
-            <div class="mb-3">
-                
-                @if (Model.Products.Id != 0)
-                {
-                    <button type="submit" class="btn btn-primary ">Update</button>
-                }
-                else
-                {
-                    <button type="submit" class="btn btn-primary ">Add</button>
-                }
 
-                <a asp-controller="Product" asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
-            </div>
 
         </form>
+
 
         @section Scripts {
             @{
@@ -61,7 +81,7 @@
             }
         }
     </main>
-      
 
-    </body>
-    </html>
+
+</body>
+</html>

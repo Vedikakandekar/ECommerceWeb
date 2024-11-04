@@ -15,6 +15,12 @@
 
 
             <input asp-for="Products.Id" hidden />
+            <div class="col-2">
+                <img src="@Model.Products.ImageUrl" width="100%"
+                     style="border-radius:5px; border:1px solid #bbb9b9" />
+
+
+            </div>
             <div class="mb-3">
                 <label asp-for="Products.Name" class="form-label">Product Name</label>
                 <input type="text" disabled class="form-control" asp-for="Products.Name" required>
@@ -32,10 +38,7 @@
                 <textarea class="form-control" disabled asp-for="Products.stock" rows="3" required></textarea>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Products.ImageUrl" class="form-label">Add Picture</label>
-                <textarea class="form-control" asp-for="Products.ImageUrl" rows="3" required></textarea>
-                </di>
+          
             <div class="mb-3">
                 <button type="submit" class="btn btn-primary">Delete Product</button>
                 <a asp-controller="Product" asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>

@@ -15,9 +15,20 @@ namespace ECommerce.Data.Repository
         {
             _db = db;
         }
-        public void Update(Products entity)
+        public void Update(Products newProduct)
         {
-            _db.Product.Update(entity);
+            var objFromDb = _db.Product.FirstOrDefault(u => u.Id == newProduct.Id);
+            if (objFromDb != null)
+            {
+                objFromDb.Name = newProduct.Name;
+                objFromDb.Price = newProduct.Price;
+                objFromDb.Description = newProduct.Description;
+                objFromDb.CategoryId = newProduct.CategoryId;
+                if (newProduct.ImageUrl != null)
+                {
+                    objFromDb.ImageUrl = newProduct.ImageUrl;
+                }
+            }
         }
     }
 }

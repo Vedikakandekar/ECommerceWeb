@@ -24,21 +24,39 @@ namespace ECommerce.Data.Repository
             // as IRepository and Repository are generic , we dont know  which class will request Repository  at run time so , 
             //we are setting dbset to _db.Set<T> , i.e in case of category class, Set will contain _db.Category
             
+            _db.Product.Include(u => u.Category).Include( u => u.CategoryId);
         }
         public void Add(T item)
         {
             Set.Add(item);
         }
 
-        public T Get(System.Linq.Expressions.Expression<Func<T, bool>> filer)
+        public T Get(System.Linq.Expressions.Expression<Func<T, bool>> filer, string? includeProperties)
         {
             IQueryable<T> query = Set;
-            return query.Where(filer).FirstOrDefault();
+            query = query.Where(filer);
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties
+                    .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            return query.FirstOrDefault()!;
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string? includeProperties)
         {
             IQueryable<T> query = Set;
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties
+                    .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
             return query.ToList();
         }
 
