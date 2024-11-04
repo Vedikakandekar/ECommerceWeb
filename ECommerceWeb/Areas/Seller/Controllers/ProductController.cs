@@ -137,6 +137,15 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             return RedirectToAction("Index", "Product"); //parameters = action name, controller name
 
         }
+
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Products> objProductList = unitOfWork.Product.GetAll(includeProperties: "Category").ToList();
+            return Json(new { data = objProductList });
+        }
+        #endregion
     }
 
 
