@@ -4,10 +4,6 @@
     {
 
         public List<string>? Notifications { get; set; }
-       
-
-       
-
-
+ 
     }
 }

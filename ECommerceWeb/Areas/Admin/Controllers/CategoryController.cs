@@ -13,13 +13,11 @@ namespace ECommerceWeb.Areas.Admin.Controllers
     public class CategoryController(IUnitOfWork unitOfWork) : Controller
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
-
         public IActionResult Index()
         {
             List<Category> categories = unitOfWork.Category.GetAll().ToList();
             return View(categories);
         }
-
         public IActionResult Upsert(int? id)
         {
             if (id == null || id == 0)
@@ -36,13 +34,11 @@ namespace ECommerceWeb.Areas.Admin.Controllers
                 else
                     return NotFound();
             }
-           
         }
 
         [HttpPost]
         public IActionResult Upsert(Category obj)
         {
-
             if (ModelState.IsValid)
             {
                 if (obj.Id == 0)
@@ -77,7 +73,6 @@ namespace ECommerceWeb.Areas.Admin.Controllers
                 return NotFound();
         }
 
-
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
@@ -90,12 +85,6 @@ namespace ECommerceWeb.Areas.Admin.Controllers
             unitOfWork.Save();
             TempData["success"] = "Category Deleted Successfully";
             return RedirectToAction("Index", "Category"); //parameters = action name, controller name
-
         }
     }
-
-
 }
-
-
-

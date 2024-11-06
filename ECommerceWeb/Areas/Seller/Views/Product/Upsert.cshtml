@@ -7,8 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-
-
     <main class="container my-5">
         <h1 class="mb-4">@(Model.Products.Id != 0 ? "Update" : "Create New") Product</h1>
         <form method="post" enctype="multipart/form-data">
@@ -17,20 +15,14 @@
             <input asp-for="Products.SellerId" hidden />
             <div class="row">
                 <div class="col-10">
-
-
                     <div class="col-2">
                         <img src="@Model.Products.ImageUrl" width="100%"
                              style="border-radius:5px; border:1px solid #bbb9b9" />
-
-
                     </div>
-
                     <div class="mb-3">
                         <label asp-for="Products.Name" class="form-label">Product Name</label>
                         <input type="text" class="form-control" asp-for="Products.Name" required>
                     </div>
-
                     <div class="mb-3">
                         <label asp-for="Products.Description" class="form-label">Product Description</label>
                         <textarea class="form-control" asp-for="Products.Description" rows="3" required></textarea>
@@ -50,13 +42,7 @@
                         <label class="form-label">Add Picture</label>
                         <input type="file"  name="file" class="form-control" rows="3" />
                     </div>
-
-
-
-
-
                     <div class="mb-3">
-
                         @if (Model.Products.Id != 0)
                         {
                             <button type="submit" class="btn btn-primary ">Update</button>
@@ -65,24 +51,16 @@
                         {
                             <button type="submit" class="btn btn-primary ">Add</button>
                         }
-
                         <a asp-controller="Product" asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
                     </div>
                 </div>
             </div>
-
-
-
         </form>
-
-
         @section Scripts {
             @{
                 <partial name="_ValidationScriptsPartial" />
             }
         }
     </main>
-
-
 </body>
 </html>

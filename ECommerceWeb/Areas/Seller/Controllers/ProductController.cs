@@ -13,14 +13,13 @@ namespace ECommerceWeb.Areas.Seller.Controllers
     [Area("Seller")]
     [Authorize(Roles = StaticDetails.Role_Seller)]
     public class ProductController
-        (IUnitOfWork unitOfWork, 
+        (IUnitOfWork unitOfWork,
         IWebHostEnvironment _webHostEnvironment,
         UserManager<IdentityUser> userManager) : Controller
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
-        private readonly IWebHostEnvironment _webHostEnvironment =_webHostEnvironment;
-        private readonly UserManager<IdentityUser> _userManager=userManager;
-
+        private readonly IWebHostEnvironment _webHostEnvironment = _webHostEnvironment;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
         public IActionResult Index()
         {
             List<Products> products = unitOfWork.Product.GetAll(u => u.SellerId == _userManager.GetUserId(User), includeProperties: "Category,").ToList();
@@ -37,10 +36,10 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                 }),
                 Products = new Products()
             };
-            if (id == null || id==0)
+            if (id == null || id == 0)
             {
-                if(_userManager.GetUserId(User)!=null)
-                productVM.Products.SellerId = _userManager.GetUserId(User)!;
+                if (_userManager.GetUserId(User) != null)
+                    productVM.Products.SellerId = _userManager.GetUserId(User)!;
                 return View(productVM);
             }
             else
@@ -53,69 +52,52 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         [HttpPost]
         public IActionResult Upsert(ProductVM obj, IFormFile? file)
         {
-   
-
             if (ModelState.IsValid)
             {
-                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                    if (file != null)
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+                    if (!string.IsNullOrEmpty(obj.Products.ImageUrl))
                     {
-                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                        string productPath = Path.Combine(wwwRootPath, @"images\product");
-                        if (!string.IsNullOrEmpty(obj.Products.ImageUrl))
+                        //delete the old image
+                        var oldImagePath =
+                            Path.Combine(wwwRootPath, obj.Products.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
                         {
-                            //delete the old image
-                            var oldImagePath =
-                                Path.Combine(wwwRootPath, obj.Products.ImageUrl.TrimStart('\\'));
-                            if (System.IO.File.Exists(oldImagePath))
-                            {
-                                System.IO.File.Delete(oldImagePath);
-                            }
+                            System.IO.File.Delete(oldImagePath);
                         }
-
-                        using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                        {
-                            file.CopyTo(fileStream);
-                        }
-                        obj.Products.ImageUrl = @"\images\product\" + fileName;
-                        
                     }
-
-                    if (obj.Products.Id == 0)
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                     {
-                   
+                        file.CopyTo(fileStream);
+                    }
+                    obj.Products.ImageUrl = @"\images\product\" + fileName;
+                }
+                if (obj.Products.Id == 0)
+                {
+
                     obj.Products.SellerId = _userManager.GetUserId(User);
-                        unitOfWork.Product.Add(obj.Products);
-                        unitOfWork.Save();
-                        TempData["success"] = "Product Created Successfully";
-                        return RedirectToAction("Index", "Product");
-                    }
-                    else
-                    {
+                    unitOfWork.Product.Add(obj.Products);
+                    unitOfWork.Save();
+                    TempData["success"] = "Product Created Successfully";
+                    return RedirectToAction("Index", "Product");
+                }
+                else
+                {
                     if (_userManager.GetUserId(User) == null)
                     {
                         return View("Error");
                     }
                     unitOfWork.Product.Update(obj.Products);
-                        unitOfWork.Save();
-                        TempData["success"] = "Product Updated Successfully";
-                        return RedirectToAction("Index", "Product");
-                    }
-                  
-                    
+                    unitOfWork.Save();
+                    TempData["success"] = "Product Updated Successfully";
+                    return RedirectToAction("Index", "Product");
                 }
-               
-            
-
+            }
             return View("Error");
         }
-
-
-       
-
-
-
-
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -139,7 +121,6 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                 return NotFound();
         }
 
-
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
@@ -152,9 +133,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             unitOfWork.Save();
             TempData["success"] = "Product Deleted Successfully";
             return RedirectToAction("Index", "Product"); //parameters = action name, controller name
-
         }
-
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
@@ -164,7 +143,4 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         }
         #endregion
     }
-
-
-
 }

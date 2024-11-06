@@ -22,9 +22,7 @@ namespace ECommerce.Models
 
         [Required]
         public double Price { get; set; }
-
         //brandId
-
         //categoryId
         public int CategoryId { get; set; }
 
@@ -38,7 +36,6 @@ namespace ECommerce.Models
         [ValidateNever]
         public string ImageUrl { get; set; }
 
-   
         public string SellerId { get; set; }
 
         [Required]

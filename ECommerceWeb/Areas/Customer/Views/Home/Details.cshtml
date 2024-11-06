@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <h3 class="text-white text-uppercase">@Model.Name</h3>
-                   @*  <p class="text-white-50 fw-semibold mb-0">Category @Model.Category.Name</p> *@
+                    @*  <p class="text-white-50 fw-semibold mb-0">Category @Model.Category.Name</p> *@
                 </div>
             </div>
         </div>
@@ -27,16 +27,16 @@
                         <div class="col-12 col-md-6 pb-4">
                             <span class="badge">@Model.Category.Name</span>
                         </div>
-                       
+
                         <div class="row ps-2">
                             <h6 class="text-dark text-opacity-50  pb-2">
-                                 Price:
-                                <span >
+                                Price:
+                                <span>
                                     @Model.Price.ToString("c")
                                 </span>
                             </h6>
                         </div>
-                       
+
                         <div class="row pl-2 my-3">
                             <p class="text-secondary lh-sm">@Html.Raw(Model.Description)</p>
                         </div>
@@ -54,7 +54,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12 col-md-6 pb-1">
-                                <button type="submit" 
+                                <button type="submit"
                                         class="btn btn-primary bg-gradient  w-100 py-2 text-uppercase fw-semibold">
                                     Add to Cart
                                 </button>
