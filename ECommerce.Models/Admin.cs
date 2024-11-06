@@ -1,6 +1,6 @@
 ﻿namespace ECommerce.Models
 {
-    public class Admin : User
+    public class Admin : ApplicationUser
     {
 
         public Admin() { }

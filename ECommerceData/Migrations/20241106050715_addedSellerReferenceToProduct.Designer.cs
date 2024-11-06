@@ -4,6 +4,7 @@ using ECommerce.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241106050715_addedSellerReferenceToProduct")]
+    partial class addedSellerReferenceToProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,8 +245,8 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -353,7 +356,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ECommerce.Models.ApplicationUser", b =>
+            modelBuilder.Entity("ECommerce.Models.User", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -361,19 +364,19 @@ namespace ECommerce.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasDiscriminator().HasValue("ApplicationUser");
+                    b.HasDiscriminator().HasValue("User");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Admin", b =>
                 {
-                    b.HasBaseType("ECommerce.Models.ApplicationUser");
+                    b.HasBaseType("ECommerce.Models.User");
 
                     b.HasDiscriminator().HasValue("Admin");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Customer", b =>
                 {
-                    b.HasBaseType("ECommerce.Models.ApplicationUser");
+                    b.HasBaseType("ECommerce.Models.User");
 
                     b.Property<string>("Notifications")
                         .HasColumnType("nvarchar(max)");
@@ -383,7 +386,7 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Seller", b =>
                 {
-                    b.HasBaseType("ECommerce.Models.ApplicationUser");
+                    b.HasBaseType("ECommerce.Models.User");
 
                     b.HasDiscriminator().HasValue("Seller");
                 });

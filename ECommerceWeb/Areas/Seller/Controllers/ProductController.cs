@@ -6,20 +6,25 @@ using Microsoft.AspNetCore.Mvc;
 using ECommerce.Data.Repository;
 using ECommerce.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace ECommerceWeb.Areas.Seller.Controllers
 {
     [Area("Seller")]
     [Authorize(Roles = StaticDetails.Role_Seller)]
-    public class ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment _webHostEnvironment) : Controller
+    public class ProductController
+        (IUnitOfWork unitOfWork, 
+        IWebHostEnvironment _webHostEnvironment,
+        UserManager<IdentityUser> userManager) : Controller
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment =_webHostEnvironment;
+        private readonly UserManager<IdentityUser> _userManager=userManager;
 
         public IActionResult Index()
         {
-            List<Products> categories = unitOfWork.Product.GetAll(includeProperties: "Category").ToList();
-            return View(categories);
+            List<Products> products = unitOfWork.Product.GetAll(u => u.SellerId == _userManager.GetUserId(User), includeProperties: "Category,").ToList();
+            return View(products);
         }
         public IActionResult Upsert(int? id)
         {

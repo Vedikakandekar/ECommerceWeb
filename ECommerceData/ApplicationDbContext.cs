@@ -20,7 +20,7 @@ namespace ECommerce.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<ApplicationUser>()
                 .HasDiscriminator<string>("Role")
                 .HasValue<Customer>("Customer")
                 .HasValue<Admin>("Admin")
@@ -35,9 +35,9 @@ namespace ECommerce.Data
 
             modelBuilder.Entity<Products>().HasData(
 
-           new Products { Id = 1, Name = "TV", Description = "60Inch", Price=50000,stock=10,CategoryId=4,ImageUrl=""},
-           new Products { Id = 2, Name = "Laptop", Description = "i10", Price=50000,stock=20, CategoryId = 4, ImageUrl = "" },
-           new Products { Id = 3, Name = "TShirt", Description = "Black Tshirt", Price=1000,stock=100, CategoryId = 1, ImageUrl = "" });
+           new Products { Id = 1, Name = "TV", Description = "60Inch", Price=50000,stock=10,CategoryId=4,ImageUrl="",SellerId= "f300ff54-1b2e-43f9-a700-b04ff20d6153" },
+           new Products { Id = 2, Name = "Laptop", Description = "i10", Price=50000,stock=20, CategoryId = 4, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" },
+           new Products { Id = 3, Name = "TShirt", Description = "Black Tshirt", Price=1000,stock=100, CategoryId = 1, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" });
 
         }
 

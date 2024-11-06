@@ -9,7 +9,7 @@ namespace ECommerce.Models
 {
     public class UserFactory : IUserFactory
     {
-        public User CreateUser(string role)
+        public ApplicationUser CreateUser(string role)
         {
             return role switch
             {

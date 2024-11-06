@@ -29,7 +29,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthorization();
 //builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
 
-builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<IdentityUser,IdentityRole>(options=> options.SignIn.RequireConfirmedAccount=false).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 var app = builder.Build();
 

@@ -151,7 +151,7 @@ namespace ECommerceWeb.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                user.UserName = Input.Name;
+                user.Name = Input.Name;
                 user.PhoneNumber = Input.PhoneNumber;
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
@@ -201,7 +201,7 @@ namespace ECommerceWeb.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private User CreateUser()
+        private ApplicationUser CreateUser()
         {
             return _userFactory.CreateUser(Input.Role ?? StaticDetails.Role_Customer);
         }

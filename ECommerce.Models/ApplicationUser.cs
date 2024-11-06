@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Models
 {
-    public interface IUserFactory
+    public class ApplicationUser:User
     {
-        ApplicationUser CreateUser(string role);
-    }
 
+    }
 }

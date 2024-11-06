@@ -1,6 +1,6 @@
 ﻿namespace ECommerce.Models
 {
-    public class Seller : User
+    public class Seller : ApplicationUser
     {
         public Seller() { }
 

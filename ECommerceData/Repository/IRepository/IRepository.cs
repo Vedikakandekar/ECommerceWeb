@@ -12,7 +12,7 @@ namespace ECommerce.Data.Repository.IRepository
 
         //T=Category
 
-        IEnumerable<T> GetAll(string? includeProperties = null);
+        IEnumerable<T> GetAll(System.Linq.Expressions.Expression<Func<T, bool>>? filer=null,string? includeProperties = null);
 
         T Get(Expression<Func<T, bool>> filer, string? includeProperties =  null);
 

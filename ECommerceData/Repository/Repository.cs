@@ -46,9 +46,13 @@ namespace ECommerce.Data.Repository
             return query.FirstOrDefault()!;
         }
 
-        public IEnumerable<T> GetAll(string? includeProperties)
+        public IEnumerable<T> GetAll(System.Linq.Expressions.Expression<Func<T, bool>>? filer , string? includeProperties)
         {
             IQueryable<T> query = Set;
+            if(filer!=null)
+            {
+                query = query.Where(filer);
+            }
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProp in includeProperties
