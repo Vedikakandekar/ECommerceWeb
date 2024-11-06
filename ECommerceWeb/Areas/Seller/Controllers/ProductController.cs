@@ -4,10 +4,13 @@ using ECommerce.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Data.Repository;
+using ECommerce.Utility;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerceWeb.Areas.Seller.Controllers
 {
     [Area("Seller")]
+    [Authorize(Roles = StaticDetails.Role_Seller)]
     public class ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment _webHostEnvironment) : Controller
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;

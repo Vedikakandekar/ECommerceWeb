@@ -1,43 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace ECommerce.Models
 {
-    public abstract class User
+    public abstract class User : IdentityUser
     {
+
         [Required]
         public string Name
         {
             get;
             set;
         }
-        [Key]
-        public int UserId
-        {
-            get;
-            set;
-        }
-
-        [Required]
-        public string PhoneNumber
-        {
-            get;
-            set;
-        }
-
-        [Required]
-        public string Email
-        {
-            get;
-            set;
-        }
-
-        [Required]
-        public string Password
-        {
-            get;
-            set;
-        }
-
+        
         [Required]
         public string Role
         {

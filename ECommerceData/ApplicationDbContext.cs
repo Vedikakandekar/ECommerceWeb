@@ -1,18 +1,25 @@
-﻿using ECommerce.Models; 
+﻿using ECommerce.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
         }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<Products> Product { get; set; }
+
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<User>()
                 .HasDiscriminator<string>("Role")
                 .HasValue<Customer>("Customer")
@@ -34,13 +41,9 @@ namespace ECommerce.Data
 
         }
 
-        public DbSet<User> User { get; set; }
-        public DbSet<Admin> Admin { get; set; }
-        public DbSet<Seller> Seller { get; set; }
-        public DbSet<Customer> Customer { get; set; }
+      
 
-        public DbSet<Category> Category { get; set; }
-        public DbSet<Products> Product { get; set; }
+      
 
     }
 }

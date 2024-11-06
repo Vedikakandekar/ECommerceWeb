@@ -3,10 +3,13 @@ using ECommerce.Models;
 using ECommerce.Data;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Data.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
+using ECommerce.Utility;
 
 namespace ECommerceWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = StaticDetails.Role_Admin)]
     public class CategoryController(IUnitOfWork unitOfWork) : Controller
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
@@ -59,12 +62,6 @@ namespace ECommerceWeb.Areas.Admin.Controllers
             }
             return View("Error");
         }
-
-
-      
-
-
-
         public IActionResult Delete(int? id)
         {
             if (id == null)
