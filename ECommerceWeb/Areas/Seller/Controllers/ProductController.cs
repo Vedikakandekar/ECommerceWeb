@@ -39,7 +39,8 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             };
             if (id == null || id==0)
             {
-                
+                if(_userManager.GetUserId(User)!=null)
+                productVM.Products.SellerId = _userManager.GetUserId(User)!;
                 return View(productVM);
             }
             else
@@ -52,6 +53,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         [HttpPost]
         public IActionResult Upsert(ProductVM obj, IFormFile? file)
         {
+   
 
             if (ModelState.IsValid)
             {
@@ -76,10 +78,13 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                             file.CopyTo(fileStream);
                         }
                         obj.Products.ImageUrl = @"\images\product\" + fileName;
+                        
                     }
 
                     if (obj.Products.Id == 0)
                     {
+                   
+                    obj.Products.SellerId = _userManager.GetUserId(User);
                         unitOfWork.Product.Add(obj.Products);
                         unitOfWork.Save();
                         TempData["success"] = "Product Created Successfully";
@@ -87,7 +92,11 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                     }
                     else
                     {
-                        unitOfWork.Product.Update(obj.Products);
+                    if (_userManager.GetUserId(User) == null)
+                    {
+                        return View("Error");
+                    }
+                    unitOfWork.Product.Update(obj.Products);
                         unitOfWork.Save();
                         TempData["success"] = "Product Updated Successfully";
                         return RedirectToAction("Index", "Product");

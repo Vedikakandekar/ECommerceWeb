@@ -38,10 +38,11 @@ namespace ECommerce.Models
         [ValidateNever]
         public string ImageUrl { get; set; }
 
-        [Required]
+   
         public string SellerId { get; set; }
 
         [Required]
+        [ValidateNever]
         [ForeignKey("SellerId")]
         public Seller Seller { get; set; }
 
