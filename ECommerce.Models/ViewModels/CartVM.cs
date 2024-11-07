@@ -13,6 +13,7 @@ namespace ECommerce.Models.ViewModels
             cart = new Cart();
             item = new CartItem();
         }
+
         public Cart cart { get; set; }
 
         public CartItem item { get; set; }

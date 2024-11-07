@@ -1,11 +1,11 @@
-﻿
+﻿@model CartVM
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-commerce Cart with Cards</title>
-    
+
     <style>
         .card {
             border: none;
@@ -13,6 +13,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: box-shadow 0.3s ease-in-out;
         }
+
             .card:hover {
                 box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
             }
@@ -20,6 +21,7 @@
         .product-card {
             margin-bottom: 20px;
         }
+
         .btn-quantity {
             min-width: 38px;
         }
@@ -30,7 +32,7 @@
         <h4 class="display-4">Your Cart</h4>
         <p class="lead">Manage your Cart here..</p>
     </header>
-    <div class="container mt-5">
+    <form method="post">    <div class="container mt-5">
         <div class="row">
             <div class="col-lg-8">
                 <div class="card mb-4">
@@ -38,60 +40,33 @@
                         <h5 class="card-title">Cart Items</h5>
                         <div class="row">
                             <div class="col-12">
-                                <div class="card product-card">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="my-0">Product name 1</h6>
-                                                <small class="text-muted">Brief description</small>
-                                            </div>
-                                            <div class="text-end">
-                                                <span class="text-muted me-2">$12.99</span>
-                                                <div class="btn-group btn-group-sm" role="group" aria-label="Quantity controls for Product 1">
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity">-</button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity" disabled>1</button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity">+</button>
+                                @foreach (CartItem listItem in Model.cart.CartItems)
+                                {
+                                    <div class="card product-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="my-0" asp-for="@listItem.Product.Name">@listItem.Product.Name</h6>
+                                                    <small class="text-muted" asp-for="@listItem.Product.Description">@listItem.Product.Description</small>
                                                 </div>
+                                                <div class="d-flex align-items-center">
+                                                  
+                                                    <span class="text-muted me-2">$<span class="product-price" asp-for="@listItem.Product.Price" data-price="@listItem.Product.Price">@listItem.Product.Price</span></span>
+                                                    <div class="btn-group btn-group-sm me-2" role="group" aria-label="Quantity controls for Product 1">
+                                                        <button type="button" class="btn btn-outline-secondary decrement">-</button>
+                                                        <button type="button" class="btn btn-outline-secondary quantity" disabled asp-for="@listItem.Quantity">@listItem.Quantity</button>
+                                                        <button type="button" class="btn btn-outline-secondary increment">+</button>
+                                                    </div>
+                                                    <a asp-controller="Cart" asp-action="Delete" asp-route-productId="@listItem.Product.Id" class="text-danger" aria-label="Delete Product">
+                                                        <i class="bi bi-trash delete-icon"></i>
+                                                    </a>
+                                                </div>
+                                              
+                                                <div class="product-total" data-price="@listItem.Product.Price">Total: $<span class="total-price"> @listItem.Product.Price</span></div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="card product-card">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="my-0">Product name 2</h6>
-                                                <small class="text-muted">Brief description</small>
-                                            </div>
-                                            <div class="text-end">
-                                                <span class="text-muted me-2">$8.99</span>
-                                                <div class="btn-group btn-group-sm" role="group" aria-label="Quantity controls for Product 2">
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity">-</button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity" disabled>2</button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity">+</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card product-card">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="my-0">Product name 3</h6>
-                                                <small class="text-muted">Brief description</small>
-                                            </div>
-                                            <div class="text-end">
-                                                <span class="text-muted me-2">$5.99</span>
-                                                <div class="btn-group btn-group-sm" role="group" aria-label="Quantity controls for Product 3">
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity">-</button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity" disabled>1</button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-quantity">+</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -104,22 +79,74 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Subtotal
-                                <span>$36.96</span>
+                                <span id="subtotal" asp-for="@Model.subtotal">$@Model.subtotal</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Shipping
-                                <span>$5.00</span>
+                                <span id="shipping-fees" asp-for="@Model.shippingFees">$@Model.shippingFees</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <strong>Total (USD)</strong>
-                                <strong>$41.96</strong>
+                                <strong id="total" asp-for="@Model.total">$@Model.total</strong>
                             </li>
                         </ul>
-                        <button class="btn btn-primary btn-lg w-100 mt-3">Proceed to Checkout</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Place Order</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const updateCart = () => {
+                let subtotal = 0;
+
+                document.querySelectorAll(".product-card").forEach((card) => {
+                    const quantityElement = card.querySelector(".quantity");
+                    const quantity = parseInt(quantityElement.textContent);
+                    const price = parseFloat(card.querySelector(".product-price").dataset.price);
+
+                    const itemSubtotal = quantity * price;
+                    subtotal += itemSubtotal;
+
+                     const totalPriceElement = card.querySelector(".total-price");
+                totalPriceElement.textContent = itemSubtotal.toFixed(2);
+                });
+
+                const shippingFees = parseFloat(document.getElementById("shipping-fees").textContent.replace("$", ""));
+                document.getElementById("subtotal").textContent = "$" + subtotal.toFixed(2);
+                document.getElementById("total").textContent = "$" + (subtotal + shippingFees).toFixed(2);
+            };
+
+            document.querySelectorAll(".increment").forEach((button) => {
+                button.addEventListener("click", function () {
+                    const quantityElement = button.parentNode.querySelector(".quantity");
+                    let quantity = parseInt(quantityElement.textContent);
+                    quantity += 1;
+                    quantityElement.textContent = quantity;
+
+                    updateCart();
+                });
+            });
+
+            document.querySelectorAll(".decrement").forEach((button) => {
+                button.addEventListener("click", function () {
+                    const quantityElement = button.parentNode.querySelector(".quantity");
+                    let quantity = parseInt(quantityElement.textContent);
+                    if (quantity > 1) {
+                        quantity -= 1;
+                        quantityElement.textContent = quantity;
+
+                        updateCart();
+                    }
+                });
+            });
+        });
+    </script>
+
+
 </body>
 </html>
