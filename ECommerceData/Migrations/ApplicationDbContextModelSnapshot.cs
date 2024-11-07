@@ -44,7 +44,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
                 });
 
             modelBuilder.Entity("ECommerce.Models.CartItem", b =>
@@ -73,7 +73,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItem");
+                    b.ToTable("CartItem", (string)null);
                 });
 
             modelBuilder.Entity("ECommerce.Models.Category", b =>
@@ -94,7 +94,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
 
                     b.HasData(
                         new
@@ -162,7 +162,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Product", (string)null);
 
                     b.HasData(
                         new

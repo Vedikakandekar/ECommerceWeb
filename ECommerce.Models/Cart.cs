@@ -23,7 +23,7 @@ namespace ECommerce.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public bool IsActive { get; set; } = true;  
+        public bool IsActive { get; set; } = false;  
 
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
