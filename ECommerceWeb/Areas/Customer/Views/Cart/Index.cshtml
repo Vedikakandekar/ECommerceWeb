@@ -7,23 +7,61 @@
     <title>E-commerce Cart with Cards</title>
 
     <style>
-        .card {
+       .card {
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease-in-out;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
         }
-
-            .card:hover {
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            }
-
-        .product-card {
-            margin-bottom: 20px;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
-
+        .product-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 0;
+            transition: background-color 0.3s ease;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-item:hover {
+            background-color: #f8f9fa;
+        }
         .btn-quantity {
             min-width: 38px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .delete-icon {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .delete-icon:hover {
+            color: #dc3545;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .shipping-card {
+            width: 100%;
+            max-width: 500px;
         }
     </style>
 </head>
@@ -32,12 +70,14 @@
         <h4 class="display-4">Your Cart</h4>
         <p class="lead">Manage your Cart here..</p>
     </header>
-    <form method="post">    <div class="container mt-5">
+    <form method="post" id="shippingForm">    <div class="container mt-5">
         <div class="row">
             <div class="col-lg-8">
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title">Cart Items</h5>
+                        <input asp-for="@Model.cart.CustomerId" hidden />
+                            <input asp-for="@Model.shippingAddress.CustomerId" hidden />
                         <div class="row">
                             <div class="col-12">
                                 @foreach (CartItem listItem in Model.cart.CartItems)
@@ -90,12 +130,57 @@
                                 <strong id="total" asp-for="@Model.total">$@Model.total</strong>
                             </li>
                         </ul>
-                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Place Order</button>
+                        <button id="checkoutBtn" class="btn btn-primary btn-lg w-100 mt-3">Proceed to Place Order</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+     <div id="shippingOverlay" class="overlay">
+        <div class="card shipping-card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Shipping Address</h5>
+               
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" asp-for="@Model.shippingAddress.FullName" class="form-control" id="fullName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" asp-for="@Model.shippingAddress.Street" class="form-control" id="address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" asp-for="@Model.shippingAddress.City" class="form-control" id="city" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" asp-for="@Model.shippingAddress.State" class="form-control" id="state" required>
+                        </div>
+                        <div class="col">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" asp-for="@Model.shippingAddress.Country" class="form-control" id="country" required>
+                        </div>
+                        <div class="col">
+                            <label for="zipCode" class="form-label">ZIP Code</label>
+                            <input type="text" asp-for="@Model.shippingAddress.ZipCode" class="form-control" id="zipCode" required>
+                        </div>
+                        <div class="col">
+                            <label for="phonenumber" class="form-label">Phone Number</label>
+                            <input type="text" asp-for="@Model.shippingAddress.PhoneNumber" class="form-control" id="phonenumber" required>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" id="cancelBtn" class="btn btn-secondary me-2">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Place Order</button>
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+
 
     </form>
 
@@ -146,7 +231,29 @@
             });
         });
     </script>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const shippingOverlay = document.getElementById('shippingOverlay');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const shippingForm = document.getElementById('shippingForm');
 
+            checkoutBtn.addEventListener('click', function() {
+                shippingOverlay.style.display = 'flex';
+            });
+
+            cancelBtn.addEventListener('click', function() {
+                shippingOverlay.style.display = 'none';
+            });
+
+            shippingForm.addEventListener('submit', function(e) {
+               
+                alert('Form submitted! Redirecting to payment...');
+                shippingOverlay.style.display = 'none';
+                shippingForm.submit();
+            });
+        });
+    </script>
 
 </body>
 </html>

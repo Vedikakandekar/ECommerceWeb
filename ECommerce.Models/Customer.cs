@@ -1,6 +1,6 @@
 ﻿namespace ECommerce.Models
 {
-    public class Customer : ApplicationUser
+    public class Customer : User
     {
 
         public List<string>? Notifications { get; set; }

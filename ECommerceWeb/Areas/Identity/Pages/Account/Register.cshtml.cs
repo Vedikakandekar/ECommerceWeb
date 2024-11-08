@@ -201,7 +201,7 @@ namespace ECommerceWeb.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private ApplicationUser CreateUser()
+        private User CreateUser()
         {
             return _userFactory.CreateUser(Input.Role ?? StaticDetails.Role_Customer);
         }

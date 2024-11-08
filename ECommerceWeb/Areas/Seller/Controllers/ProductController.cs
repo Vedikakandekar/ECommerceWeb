@@ -15,11 +15,11 @@ namespace ECommerceWeb.Areas.Seller.Controllers
     public class ProductController
         (IUnitOfWork unitOfWork,
         IWebHostEnvironment _webHostEnvironment,
-        UserManager<ApplicationUser> userManager) : Controller
+        UserManager<User> userManager) : Controller
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment = _webHostEnvironment;
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly UserManager<User> _userManager = userManager;
         public IActionResult Index()
         {
             List<Products> products = unitOfWork.Product.GetAll(u => u.SellerId == _userManager.GetUserId(User), includeProperties: "Category,").ToList();

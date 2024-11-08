@@ -8,7 +8,7 @@ namespace ECommerce.Models
 {
     public interface IUserFactory
     {
-        ApplicationUser CreateUser(string role);
+        User CreateUser(string role);
     }
 
 }

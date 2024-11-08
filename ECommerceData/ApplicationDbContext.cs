@@ -17,7 +17,7 @@ namespace ECommerce.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<ApplicationUser>()
+            modelBuilder.Entity<User>()
                 .HasDiscriminator<string>("Role")
                 .HasValue<Customer>("Customer")
                 .HasValue<Admin>("Admin")

@@ -12,6 +12,7 @@ namespace ECommerce.Models.ViewModels
         {
             cart = new Cart();
             item = new CartItem();
+            shippingAddress = new ShippingAddress();
         }
 
         public Cart cart { get; set; }
@@ -23,5 +24,7 @@ namespace ECommerce.Models.ViewModels
         public float total { get; set; }
 
         public float shippingFees { get; set; } 
+
+        public ShippingAddress shippingAddress { get; set; }
     }
 }

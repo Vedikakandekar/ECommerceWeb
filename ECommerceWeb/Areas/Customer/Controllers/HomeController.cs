@@ -58,8 +58,8 @@ namespace ECommerceWeb.Areas.Customer.Controllers
         [HttpPost, ActionName("Details")]
         public IActionResult DetailsPost(int productId)
         {
-
-            if (_userManager.GetUserId(User) == "" || _userManager.GetUserId(User) == null)
+            string currentLoggedInUser = _userManager.GetUserId(User);
+            if (currentLoggedInUser == "" || currentLoggedInUser == null)
             {
                 return View("Login");
             }
@@ -80,7 +80,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 cartVM.item.Price = (decimal)product.Price;
                 cartVM.item.Quantity = 1;
                 cartVM.shippingFees = 5;
-                Cart oldCart = _unitOfWork.Cart.Get(u => u.CustomerId == cartVM.cart.CustomerId);
+                Cart oldCart = _unitOfWork.Cart.Get(u => u.CustomerId == currentLoggedInUser);
                 if (oldCart == null)
                 {
 
@@ -103,19 +103,13 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                         return View("Error");
                 }
                 else
-                    if (!oldCart.IsActive && oldCart.CartId != 0)
+                    if ( oldCart.CartId != 0)
                 {
-                    cartVM.cart.IsActive = true;
-                    _unitOfWork.Cart.Update(cartVM.cart);
-                   
+                    
                     cartVM.item.CartId = oldCart.CartId;
                     _unitOfWork.CartItem.Add(cartVM.item);
                     _unitOfWork.Save();
                 }
-
-
-
-
 
                 return RedirectToAction("Index", "Home");
             }

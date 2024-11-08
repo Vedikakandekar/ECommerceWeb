@@ -32,8 +32,33 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             cartVM.subtotal = (float)cartVM.cart.CartItems.Sum(item => item.Quantity * item.Price);
             cartVM.shippingFees = 50;
             cartVM.total = cartVM.subtotal + cartVM.shippingFees;
+            cartVM.shippingAddress.CustomerId = currentLoggedInUSer;
             return View(cartVM);
         }
+
+
+        [HttpPost, ActionName("Index")]
+        public IActionResult IndexPost(CartVM cartVM)
+        {
+            string currentLogedInUser = _userManager.GetUserId(User);
+            if (currentLogedInUser == null)
+            {
+                return View("Error");
+            }
+
+            if (ModelState.IsValid)
+            {
+
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            return RedirectToAction("Error");
+        }
+
+
+
+
 
         public IActionResult Delete(int productId)
         {
