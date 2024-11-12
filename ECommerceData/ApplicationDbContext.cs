@@ -16,6 +16,8 @@ namespace ECommerce.Data
         public DbSet<Order> order { get; set; }
         public DbSet<OrderItem> orderItems { get; set; }
 
+        public DbSet<ShippingAddress> ShippingAddress { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

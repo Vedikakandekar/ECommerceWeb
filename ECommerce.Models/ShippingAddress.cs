@@ -11,6 +11,7 @@ namespace ECommerce.Models
 {
     public class ShippingAddress
     {
+        [Key]
         public int AddressId { get; set; }
         [Required]
         public string CustomerId { get; set; }

@@ -16,6 +16,10 @@ namespace ECommerce.Data.Repository.IRepository
 
         ICartItemRepository CartItem { get; }
 
+        IOrderRepository Order { get; }
+
+        IOrderItemRepository OrderItem { get; }
+
         void Save();
     }
 }

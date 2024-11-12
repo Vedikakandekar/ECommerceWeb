@@ -28,6 +28,11 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             }
             CartVM cartVM = new CartVM();
             cartVM.cart = _unitOfWork.Cart.Get(u => u.CustomerId == currentLoggedInUSer);
+            if(cartVM.cart==null)
+            {
+                cartVM.cart = new Cart();
+                return View(cartVM);
+            }
             cartVM.cart.CartItems = _unitOfWork.CartItem.GetAll(u => u.CartId == cartVM.cart.CartId, includeProperties: "Product").ToList();
             cartVM.subtotal = (float)cartVM.cart.CartItems.Sum(item => item.Quantity * item.Price);
             cartVM.shippingFees = 50;
@@ -39,16 +44,46 @@ namespace ECommerceWeb.Areas.Customer.Controllers
 
         [HttpPost, ActionName("Index")]
         public IActionResult IndexPost(CartVM cartVM)
-        {
+            {
             string currentLogedInUser = _userManager.GetUserId(User);
-            if (currentLogedInUser == null)
+            if (currentLogedInUser == null || cartVM.cart.CartItems.Count==0)
             {
                 return View("Error");
             }
 
             if (ModelState.IsValid)
             {
+                Order order = new Order();
+                order.OrderDate = DateTime.Now;
+                order.TotalAmount = (decimal)cartVM.total;
+                order.customerId = currentLogedInUser;
+                 
+                _unitOfWork.Order.Add(order);
+                _unitOfWork.Save();
 
+                Order newOrder = _unitOfWork.Order.Get(u=>u.OrderDate==order.OrderDate);
+                 
+             
+                
+                foreach(CartItem listItem in cartVM.cart.CartItems)
+                {
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.OrderId = newOrder.OrderId;
+                    orderItem.Quantity = listItem.Quantity;
+                    orderItem.UnitPrice = (decimal)listItem.Product.Price;
+                    orderItem.TotalPrice = listItem.Quantity * (decimal)listItem.Product.Price;
+                    orderItem.ProductId = listItem.ProductId;
+
+                    _unitOfWork.OrderItem.Add(orderItem);
+                    _unitOfWork.Save();
+                }
+
+                Cart cartToRemove = _unitOfWork.Cart.Get(u => u.CartId == cartVM.cart.CartId);
+
+                _unitOfWork.CartItem.RemoveRane(_unitOfWork.CartItem.GetAll(u=>u.CartId==cartVM.cart.CartId));
+                _unitOfWork.Save();
+                _unitOfWork.Cart.Remove(cartToRemove);
+                _unitOfWork.Save();
 
                 return RedirectToAction("Index", "Home");
             }

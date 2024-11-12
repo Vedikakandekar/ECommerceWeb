@@ -7,46 +7,56 @@
     <title>E-commerce Cart with Cards</title>
 
     <style>
-       .card {
+        .card {
             border: none;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease-in-out;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            }
+
         .product-item {
             border-bottom: 1px solid #e9ecef;
             padding: 20px 0;
             transition: background-color 0.3s ease;
         }
-        .product-item:last-child {
-            border-bottom: none;
-        }
-        .product-item:hover {
-            background-color: #f8f9fa;
-        }
+
+            .product-item:last-child {
+                border-bottom: none;
+            }
+
+            .product-item:hover {
+                background-color: #f8f9fa;
+            }
+
         .btn-quantity {
             min-width: 38px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .btn-primary {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            }
+
         .delete-icon {
             cursor: pointer;
             transition: color 0.3s ease;
         }
-        .delete-icon:hover {
-            color: #dc3545;
-        }
+
+            .delete-icon:hover {
+                color: #dc3545;
+            }
+
         .overlay {
             position: fixed;
             top: 0;
@@ -59,6 +69,7 @@
             align-items: center;
             z-index: 1000;
         }
+
         .shipping-card {
             width: 100%;
             max-width: 500px;
@@ -70,78 +81,111 @@
         <h4 class="display-4">Your Cart</h4>
         <p class="lead">Manage your Cart here..</p>
     </header>
-    <form method="post" id="shippingForm">    <div class="container mt-5">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Cart Items</h5>
-                        <input asp-for="@Model.cart.CustomerId" hidden />
+    <form method="post" id="shippingForm">
+
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Cart Items</h5>
+                            <input asp-for="@Model.cart.CustomerId" hidden />
+                            <input asp-for="@Model.cart.CartId" hidden />
                             <input asp-for="@Model.shippingAddress.CustomerId" hidden />
-                        <div class="row">
-                            <div class="col-12">
-                                @foreach (CartItem listItem in Model.cart.CartItems)
-                                {
-                                    <div class="card product-card">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <h6 class="my-0" asp-for="@listItem.Product.Name">@listItem.Product.Name</h6>
-                                                    <small class="text-muted" asp-for="@listItem.Product.Description">@listItem.Product.Description</small>
-                                                </div>
-                                                <div class="d-flex align-items-center">
-                                                  
-                                                    <span class="text-muted me-2">$<span class="product-price" asp-for="@listItem.Product.Price" data-price="@listItem.Product.Price">@listItem.Product.Price</span></span>
-                                                    <div class="btn-group btn-group-sm me-2" role="group" aria-label="Quantity controls for Product 1">
-                                                        <button type="button" class="btn btn-outline-secondary decrement">-</button>
-                                                        <button type="button" class="btn btn-outline-secondary quantity" disabled asp-for="@listItem.Quantity">@listItem.Quantity</button>
-                                                        <button type="button" class="btn btn-outline-secondary increment">+</button>
+
+
+                            
+                            <div class="row">
+                                
+                                <div class="col-12">
+                                    
+                                    @for (int index = 0; index < Model.cart.CartItems.Count; index++)
+                                    {
+                                        var item = @Model.cart.CartItems[index];
+                                        <div class="card product-card">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="my-0">@item.Product.Name</h6>
+                                                        <input asp-for="cart.CartItems[index].Product.Name" hidden />
+                                                        <small class="text-muted" asp-for="cart.CartItems[index].Product">@item.Product.Description</small>
+                                                        <input asp-for="cart.CartItems[index].Product.Description" hidden />
+                                                        <input asp-for="cart.CartItems[index].Product.Id" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].ProductId" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].Price" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].Product.Price" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].Product.CategoryId" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].Product.stock" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].Product.ImageUrl" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].Product.SellerId" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].CartItemId" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].CartId" type="hidden" />
+                                                        <input asp-for="cart.CartItems[index].CartItemId" type="hidden" />
+
                                                     </div>
-                                                    <a asp-controller="Cart" asp-action="Delete" asp-route-productId="@listItem.Product.Id" class="text-danger" aria-label="Delete Product">
-                                                        <i class="bi bi-trash delete-icon"></i>
-                                                    </a>
+                                                    <div class="d-flex align-items-center">
+
+                                                        <span asp-for="@Model.cart.CartItems[index].Price" class="text-muted me-2">$<span class="product-price" data-price="@item.Product.Price">@item.Product.Price</span></span>
+                                                        <div class="btn-group btn-group-sm me-2" role="group" aria-label="Quantity controls for Product 1">
+                                                            <button type="button" class="btn btn-outline-secondary decrement">-</button>
+                                                            <button type="button" class="btn btn-outline-secondary quantity" disabled asp-for="cart.CartItems.ElementAt(index).Quantity">@item.Quantity</button>
+                                                            <input asp-for="@Model.cart.CartItems[index].Quantity" type="hidden" class="quantity-input" />
+                                                            <button type="button" id="increaseId" class="btn btn-outline-secondary increment">+</button>
+                                                        </div>
+                                                        <a asp-controller="Cart" asp-action="Delete" asp-route-productId="cart.CartItems[index].Product.Id" class="text-danger" aria-label="Delete Product">
+                                                            <i class="bi bi-trash delete-icon"></i>
+                                                        </a>
+                                                    </div>
+
+                                                    <div class="product-total" data-price="@item.Product.Price">Total: $<span class="total-price"> @item.Product.Price</span></div>
                                                 </div>
-                                              
-                                                <div class="product-total" data-price="@listItem.Product.Price">Total: $<span class="total-price"> @listItem.Product.Price</span></div>
                                             </div>
                                         </div>
-                                    </div>
-                                }
+                                    }
+                                </div>
                             </div>
+                                    
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Cart Summary</h5>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Subtotal
-                                <span id="subtotal" asp-for="@Model.subtotal">$@Model.subtotal</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Shipping
-                                <span id="shipping-fees" asp-for="@Model.shippingFees">$@Model.shippingFees</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <strong>Total (USD)</strong>
-                                <strong id="total" asp-for="@Model.total">$@Model.total</strong>
-                            </li>
-                        </ul>
-                        <button id="checkoutBtn" class="btn btn-primary btn-lg w-100 mt-3">Proceed to Place Order</button>
+             @if ( Model.cart.CartItems.Count > 0)
+                                {
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Cart Summary</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Subtotal
+                                    <span id="subtotal" asp-for="@Model.subtotal">$@Model.subtotal</span>
+                                    <input hidden id="subtotalSpan" asp-for="@Model.subtotal" />
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Shipping
+                                    <span id="shipping-fees" asp-for="@Model.shippingFees">$@Model.shippingFees</span>
+                                    <input hidden id="shippinglSpan" asp-for="@Model.shippingFees" />
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <strong>Total (USD)</strong>
+                                    <strong id="total" asp-for="@Model.total">$@Model.total</strong>
+                                    <input hidden id="totalSpan" asp-for="@Model.total" />
+                                </li>
+                            </ul>
+                                
+                            <button id="checkoutBtn" class="btn btn-primary btn-lg w-100 mt-3">Proceed to Place Order</button>
+                             
+                        </div>
                     </div>
                 </div>
+                }
             </div>
         </div>
-    </div>
-
-     <div id="shippingOverlay" class="overlay">
-        <div class="card shipping-card">
-            <div class="card-body">
-                <h5 class="card-title mb-4">Shipping Address</h5>
-               
+                              
+  
+        <div id="shippingOverlay" class="overlay">
+            <div class="card shipping-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Shipping Address</h5>
                     <div class="mb-3">
                         <label for="fullName" class="form-label">Full Name</label>
                         <input type="text" asp-for="@Model.shippingAddress.FullName" class="form-control" id="fullName" required>
@@ -176,31 +220,26 @@
                         <button type="button" id="cancelBtn" class="btn btn-secondary me-2">Cancel</button>
                         <button type="submit" class="btn btn-primary">Place Order</button>
                     </div>
-                
+                </div>
             </div>
         </div>
-    </div>
-
-
     </form>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const updateCart = () => {
                 let subtotal = 0;
-
                 document.querySelectorAll(".product-card").forEach((card) => {
                     const quantityElement = card.querySelector(".quantity");
                     const quantity = parseInt(quantityElement.textContent);
                     const price = parseFloat(card.querySelector(".product-price").dataset.price);
-
+                    const quantityInput = card.querySelector(".quantity-input");
                     const itemSubtotal = quantity * price;
                     subtotal += itemSubtotal;
-
-                     const totalPriceElement = card.querySelector(".total-price");
-                totalPriceElement.textContent = itemSubtotal.toFixed(2);
+                    const totalPriceElement = card.querySelector(".total-price");
+                    totalPriceElement.textContent = itemSubtotal.toFixed(2);
+                    quantityInput.value = quantity;
                 });
-
                 const shippingFees = parseFloat(document.getElementById("shipping-fees").textContent.replace("$", ""));
                 document.getElementById("subtotal").textContent = "$" + subtotal.toFixed(2);
                 document.getElementById("total").textContent = "$" + (subtotal + shippingFees).toFixed(2);
@@ -208,46 +247,42 @@
 
             document.querySelectorAll(".increment").forEach((button) => {
                 button.addEventListener("click", function () {
+                    const card = button.closest(".product-card")
                     const quantityElement = button.parentNode.querySelector(".quantity");
                     let quantity = parseInt(quantityElement.textContent);
                     quantity += 1;
                     quantityElement.textContent = quantity;
-
                     updateCart();
                 });
             });
 
             document.querySelectorAll(".decrement").forEach((button) => {
                 button.addEventListener("click", function () {
+                    const card = button.closest(".product-card")
                     const quantityElement = button.parentNode.querySelector(".quantity");
                     let quantity = parseInt(quantityElement.textContent);
                     if (quantity > 1) {
                         quantity -= 1;
                         quantityElement.textContent = quantity;
-
                         updateCart();
                     }
                 });
             });
         });
     </script>
-     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             const checkoutBtn = document.getElementById('checkoutBtn');
             const shippingOverlay = document.getElementById('shippingOverlay');
             const cancelBtn = document.getElementById('cancelBtn');
             const shippingForm = document.getElementById('shippingForm');
-
-            checkoutBtn.addEventListener('click', function() {
+            checkoutBtn.addEventListener('click', function () {
                 shippingOverlay.style.display = 'flex';
             });
-
-            cancelBtn.addEventListener('click', function() {
+            cancelBtn.addEventListener('click', function () {
                 shippingOverlay.style.display = 'none';
             });
-
-            shippingForm.addEventListener('submit', function(e) {
-               
+            shippingForm.addEventListener('submit', function (e) {
                 alert('Form submitted! Redirecting to payment...');
                 shippingOverlay.style.display = 'none';
                 shippingForm.submit();
