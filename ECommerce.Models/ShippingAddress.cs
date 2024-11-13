@@ -35,7 +35,7 @@ namespace ECommerce.Models
         [Required]
         public string PhoneNumber { get; set; }
         [Required]
-        public bool IsDefault { get; set; }
+        public bool IsDefault { get; set; }=false;
 
        
     }

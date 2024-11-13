@@ -28,6 +28,8 @@ namespace ECommerce.Models
         [ValidateNever]
         [ForeignKey("customerId")]
         public virtual Customer customer { get; set; }
+        [Required]
+        public string AddressId { get; set; }
 
         // Navigation property to OrderItems
         [ValidateNever]

@@ -20,6 +20,8 @@ namespace ECommerce.Data.Repository.IRepository
 
         IOrderItemRepository OrderItem { get; }
 
+        IShippingAddressRepository ShippingAddress { get; }
+
         void Save();
     }
 }

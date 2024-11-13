@@ -74,6 +74,19 @@
             width: 100%;
             max-width: 500px;
         }
+
+        .address-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .address-card:hover {
+                background-color: #f8f9fa;
+            }
+
+            .address-card.selected {
+                border: 2px solid #007bff;
+            }
     </style>
 </head>
 <body>
@@ -81,7 +94,7 @@
         <h4 class="display-4">Your Cart</h4>
         <p class="lead">Manage your Cart here..</p>
     </header>
-    <form method="post" id="shippingForm">
+    <form method="post" id="OrderForm">
 
         <div class="container mt-5">
             <div class="row">
@@ -94,11 +107,11 @@
                             <input asp-for="@Model.shippingAddress.CustomerId" hidden />
 
 
-                            
+
                             <div class="row">
-                                
+
                                 <div class="col-12">
-                                    
+
                                     @for (int index = 0; index < Model.cart.CartItems.Count; index++)
                                     {
                                         var item = @Model.cart.CartItems[index];
@@ -132,7 +145,7 @@
                                                             <input asp-for="@Model.cart.CartItems[index].Quantity" type="hidden" class="quantity-input" />
                                                             <button type="button" id="increaseId" class="btn btn-outline-secondary increment">+</button>
                                                         </div>
-                                                        <a asp-controller="Cart" asp-action="Delete" asp-route-productId="cart.CartItems[index].Product.Id" class="text-danger" aria-label="Delete Product">
+                                                        <a asp-controller="Cart" asp-action="Delete" asp-route-productId="@Model.cart.CartItems[index].Product.Id" class="text-danger" aria-label="Delete Product">
                                                             <i class="bi bi-trash delete-icon"></i>
                                                         </a>
                                                     </div>
@@ -144,48 +157,91 @@
                                     }
                                 </div>
                             </div>
-                                    
+
                         </div>
                     </div>
                 </div>
-             @if ( Model.cart.CartItems.Count > 0)
-                                {
-                <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Cart Summary</h5>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Subtotal
-                                    <span id="subtotal" asp-for="@Model.subtotal">$@Model.subtotal</span>
-                                    <input hidden id="subtotalSpan" asp-for="@Model.subtotal" />
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Shipping
-                                    <span id="shipping-fees" asp-for="@Model.shippingFees">$@Model.shippingFees</span>
-                                    <input hidden id="shippinglSpan" asp-for="@Model.shippingFees" />
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <strong>Total (USD)</strong>
-                                    <strong id="total" asp-for="@Model.total">$@Model.total</strong>
-                                    <input hidden id="totalSpan" asp-for="@Model.total" />
-                                </li>
-                            </ul>
-                                
-                            <button id="checkoutBtn" class="btn btn-primary btn-lg w-100 mt-3">Proceed to Place Order</button>
-                             
+                @if (Model.cart.CartItems.Count > 0)
+                {
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Cart Summary</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Subtotal
+                                        <span id="subtotal" asp-for="@Model.subtotal">$@Model.subtotal</span>
+                                        <input hidden id="subtotalSpan" asp-for="@Model.subtotal" />
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Shipping
+                                        <span id="shipping-fees" asp-for="@Model.shippingFees">$@Model.shippingFees</span>
+                                        <input hidden id="shippinglSpan" asp-for="@Model.shippingFees" />
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <strong>Total (USD)</strong>
+                                        <strong id="total" asp-for="@Model.total">$@Model.total</strong>
+                                        <input hidden id="totalSpan" asp-for="@Model.total" />
+                                    </li>
+                                </ul>
+
+
+
+                            </div>
                         </div>
                     </div>
-                </div>
                 }
             </div>
         </div>
+        <input id="AddressId" asp-for="@Model.shippingAddress.AddressId" type="hidden" />
+        <input id="FullName" asp-for="@Model.shippingAddress.FullName" type="hidden" />
+        <input id="PhoneNumber" asp-for="@Model.shippingAddress.PhoneNumber" type="hidden" />
+        <input id="Street"  asp-for="@Model.shippingAddress.Street" type="hidden" />
+        <input id="City" asp-for="@Model.shippingAddress.City" type="hidden" />
+        <input id="State" asp-for="@Model.shippingAddress.State" type="hidden" />
+        <input id="Country"  asp-for="@Model.shippingAddress.Country" type="hidden" />
+        <input id="ZipCode" asp-for="@Model.shippingAddress.ZipCode" type="hidden" />
+
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Select Shipping Address</h5>
+                <div id="addressList">
+                    @for (int index = 0; index < Model.addressList.Count; index++)
+                    {
+                        <input id="AddressId" asp-for="@Model.addressList[index].AddressId" type="hidden" />
+                        <div class="card address-card mb-3" data-address-id="@Model.addressList[index].AddressId">
+                            <div class="card-body">
                               
-  
-        <div id="shippingOverlay" class="overlay">
-            <div class="card shipping-card">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">Shipping Address</h5>
+                                <h6 class="card-title">@Model.addressList[index].FullName</h6>
+                                <h6 class="card-title">@Model.addressList[index].PhoneNumber</h6>
+                                <p class="card-text">@Model.addressList[index].Street , @Model.addressList[index].City , @Model.addressList[index].State , @Model.addressList[index].Country, @Model.addressList[index].ZipCode </p>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+                <button id="addNewAddressBtn" type="button" class="btn btn-outline-primary mt-3">
+                    <i class="bi bi-plus-circle me-2"></i>Add New Address
+                </button>
+            </div>
+        </div>
+
+        <button id="proceedToPaymentBtn" type="submit" class="btn btn-primary btn-lg w-100 mt-4">Proceed to Payment</button>
+
+
+
+
+    </form>
+
+    <div id="shippingOverlay" class="overlay">
+        <div class="card shipping-card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Shipping Address</h5>
+                <form method="post" id="AddressForm">
+                    <input asp-for="@Model.shippingAddress.CustomerId" class="form-control" id="CustomerId" hidden />
+                    <input asp-for="@Model.shippingAddress.AddressId" class="form-control" id="AddressId" hidden />
+
                     <div class="mb-3">
                         <label for="fullName" class="form-label">Full Name</label>
                         <input type="text" asp-for="@Model.shippingAddress.FullName" class="form-control" id="fullName" required>
@@ -218,16 +274,17 @@
                     </div>
                     <div class="d-flex justify-content-end">
                         <button type="button" id="cancelBtn" class="btn btn-secondary me-2">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Place Order</button>
+                        <button type="submit" class="btn btn-primary">Save Address</button>
                     </div>
-                </div>
+
+                </form>
             </div>
         </div>
-    </form>
-
+    </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const updateCart = () => {
+
                 let subtotal = 0;
                 document.querySelectorAll(".product-card").forEach((card) => {
                     const quantityElement = card.querySelector(".quantity");
@@ -272,23 +329,135 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const checkoutBtn = document.getElementById('checkoutBtn');
+            const addNewAddressBtn = document.getElementById('addNewAddressBtn');
             const shippingOverlay = document.getElementById('shippingOverlay');
             const cancelBtn = document.getElementById('cancelBtn');
-            const shippingForm = document.getElementById('shippingForm');
-            checkoutBtn.addEventListener('click', function () {
+            const OrderForm = document.getElementById('OrderForm');
+            const AddressForm = document.getElementById('AddressForm');
+            const addressList = document.getElementById('addressList');
+            const proceedToPaymentBtn = document.getElementById('proceedToPaymentBtn');
+
+            function selectAddress(id) {
+
+                const addresses = addressList.querySelectorAll('.address-card');
+                addresses.forEach(addr => {
+                  
+                    if (addr.dataset.addressId === id.toString()) {
+                        addr.classList.add('selected');
+                  
+                        document.getElementById('AddressId').value = id;
+                        document.getElementById('FullName').value = addr.querySelector('.card-title').textContent;
+                        document.getElementById('PhoneNumber').value = addr.querySelectorAll('.card-title')[1].textContent;
+                        document.getElementById('Street').value = addr.querySelector('.card-text').textContent.split(", ")[0];
+                        document.getElementById('City').value = addr.querySelector('.card-text').textContent.split(", ")[1];
+                        document.getElementById('State').value = addr.querySelector('.card-text').textContent.split(", ")[2];
+                        document.getElementById('Country').value = addr.querySelector('.card-text').textContent.split(", ")[3];
+                        document.getElementById('ZipCode').value = addr.querySelector('.card-text').textContent.split(", ")[4];
+                 
+                    } else {
+                        addr.classList.remove('selected');
+                    }
+                });
+            }
+
+            function getSelectedAddress() {
+                const selectedAddress = addressList.querySelector('.address-card.selected');
+                if (selectedAddress) {
+
+                    return {
+                        id: selectedAddress.dataset.addressId,
+                        name: selectedAddress.querySelector('.card-title').textContent,
+                        address: selectedAddress.querySelector('.card-text').textContent
+                    };
+                }
+                return null;
+            }
+
+            addressList.addEventListener('click', function (e) {
+                const addressCard = e.target.closest('.address-card');
+                if (addressCard) {
+                   
+                    selectAddress(addressCard.dataset.addressId);
+                   
+                }
+            });
+
+            addNewAddressBtn.addEventListener('click', function () {
+
                 shippingOverlay.style.display = 'flex';
             });
+
             cancelBtn.addEventListener('click', function () {
                 shippingOverlay.style.display = 'none';
             });
-            shippingForm.addEventListener('submit', function (e) {
-                alert('Form submitted! Redirecting to payment...');
+
+            AddressForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const addressData = {
+                    FullName: document.getElementById('fullName').value,
+                    Street: document.getElementById('address').value,
+                    City: document.getElementById('city').value,
+                    State: document.getElementById('state').value,
+                    Country: document.getElementById('country').value,
+                    ZipCode: document.getElementById('zipCode').value,
+                    PhoneNumber: document.getElementById('phonenumber').value,
+                    AddressId: document.getElementById('AddressId').value,
+                    CustomerId: document.getElementById('CustomerId').value
+                };
+
+                // Send AJAX request to addAddress action
+                fetch('/Customer/Cart/AddAddress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' // Indicates it's an AJAX request
+                    },
+                    body: JSON.stringify(addressData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+
+                            // Create a new address card element dynamically and add it to the address list
+                            const newAddress = document.createElement('div');
+                            newAddress.className = 'card address-card mb-3';
+                            newAddress.dataset.addressId = data.addressId; // Assuming server returns the new address ID
+                            newAddress.innerHTML = `
+                                <div class="card-body">
+                                    <h6 class="card-title">${addressData.FullName}</h6>
+                                             <h6 class="card-title">${addressData.PhoneNumber}</h6>
+                                    <p class="card-text">${addressData.Street}, ${addressData.City}, ${addressData.State} ${addressData.ZipCode}</p>
+                                </div>
+                            `;
+                            addressList.appendChild(newAddress);
+                            shippingOverlay.style.display = 'none';
+                            AddressForm.reset();
+                        } else {
+                            alert('Error: Could not add address');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('There was an error adding the address.');
+                    });
                 shippingOverlay.style.display = 'none';
-                shippingForm.submit();
+                AddressForm.reset();
+            });
+
+            OrderForm.addEventListener('submit', function (e) {
+
+                const selectedAddress = getSelectedAddress();
+                if (selectedAddress) {
+                    alert(`Proceeding to payment with address:\nName: ${selectedAddress.name}\nAddress: ${selectedAddress.address}`);
+                    console.log('Selected address:', selectedAddress);
+                    // Here you would typically send the selected address to your server or payment processor
+                    OrderForm.submit();
+                } else {
+                    alert('Please select a shipping address');
+                }
             });
         });
     </script>
-
 </body>
 </html>

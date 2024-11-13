@@ -16,6 +16,8 @@ namespace ECommerce.Data.Repository
         public IOrderRepository Order { get; private set; }
         public IOrderItemRepository OrderItem { get; private set; }
 
+        public IShippingAddressRepository ShippingAddress { get; private set; }
+
 
         public ICartItemRepository CartItem { get; private set; }
 
@@ -28,6 +30,7 @@ namespace ECommerce.Data.Repository
             CartItem = new CartItemRepository(_db);
             Order = new OrderRepository(_db);
             OrderItem = new OrderItemRepository(_db);
+            ShippingAddress = new ShippingAddressRepositoy(_db);
         }
         public void Save()
         {

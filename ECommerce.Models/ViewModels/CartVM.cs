@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,5 +27,8 @@ namespace ECommerce.Models.ViewModels
         public float shippingFees { get; set; } 
 
         public ShippingAddress shippingAddress { get; set; }
+
+        [ValidateNever]
+        public List<ShippingAddress> addressList { get; set; } = new List<ShippingAddress>();
     }
 }

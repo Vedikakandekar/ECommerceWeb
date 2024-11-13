@@ -4,6 +4,7 @@ using ECommerce.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
+using System.Text.Json;
 
 namespace ECommerceWeb.Areas.Customer.Controllers
 {
@@ -38,6 +39,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             cartVM.shippingFees = 50;
             cartVM.total = cartVM.subtotal + cartVM.shippingFees;
             cartVM.shippingAddress.CustomerId = currentLoggedInUSer;
+            cartVM.addressList = _unitOfWork.ShippingAddress.GetAll(u => u.CustomerId == currentLoggedInUSer).ToList();
             return View(cartVM);
         }
 
@@ -57,7 +59,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 order.OrderDate = DateTime.Now;
                 order.TotalAmount = (decimal)cartVM.total;
                 order.customerId = currentLogedInUser;
-                 
+                order.AddressId = JsonSerializer.Serialize(cartVM.shippingAddress);
                 _unitOfWork.Order.Add(order);
                 _unitOfWork.Save();
 
@@ -110,6 +112,28 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             _unitOfWork.CartItem.Remove(itemToDelete);
             _unitOfWork.Save();
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult AddAddress([FromBody] ShippingAddress model)
+        {
+            string currentLoggedInUSer = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(currentLoggedInUSer))
+            {
+                return View("Error");
+            }
+            if (ModelState.IsValid)
+            {
+                if(string.IsNullOrEmpty(model.CustomerId))
+                {
+                    model.CustomerId = currentLoggedInUSer;
+                }
+                _unitOfWork.ShippingAddress.Add(model);
+                _unitOfWork.Save();
+                return Json(new { success = true});
+            }
+
+            return  View("Error");
         }
 
 
