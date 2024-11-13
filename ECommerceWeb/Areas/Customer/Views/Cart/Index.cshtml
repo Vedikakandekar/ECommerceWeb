@@ -203,7 +203,7 @@
         <input id="ZipCode" asp-for="@Model.shippingAddress.ZipCode" type="hidden" />
 
 
-        <div class="card mb-4">
+        <div class="card mb-4 mt-2">
             <div class="card-body">
                 <h5 class="card-title mb-4">Select Shipping Address</h5>
                 <div id="addressList">
@@ -212,7 +212,9 @@
                         <input id="AddressId" asp-for="@Model.addressList[index].AddressId" type="hidden" />
                         <div class="card address-card mb-3" data-address-id="@Model.addressList[index].AddressId">
                             <div class="card-body">
-                              
+                                <a asp-controller="Cart" asp-action="DeleteAddress" asp-route-addressId="@Model.addressList[index].AddressId"  class="position-absolute top-0 end-0 m-2" aria-label="Delete">
+                                    <i class="bi bi-trash delete-icon"></i>
+                                </a>
                                 <h6 class="card-title">@Model.addressList[index].FullName</h6>
                                 <h6 class="card-title">@Model.addressList[index].PhoneNumber</h6>
                                 <p class="card-text">@Model.addressList[index].Street , @Model.addressList[index].City , @Model.addressList[index].State , @Model.addressList[index].Country, @Model.addressList[index].ZipCode </p>
@@ -231,7 +233,7 @@
 
 
 
-
+               
     </form>
 
     <div id="shippingOverlay" class="overlay">
@@ -419,18 +421,8 @@
                     .then(data => {
                         if (data.success) {
 
-                            // Create a new address card element dynamically and add it to the address list
-                            const newAddress = document.createElement('div');
-                            newAddress.className = 'card address-card mb-3';
-                            newAddress.dataset.addressId = data.addressId; // Assuming server returns the new address ID
-                            newAddress.innerHTML = `
-                                <div class="card-body">
-                                    <h6 class="card-title">${addressData.FullName}</h6>
-                                             <h6 class="card-title">${addressData.PhoneNumber}</h6>
-                                    <p class="card-text">${addressData.Street}, ${addressData.City}, ${addressData.State} ${addressData.ZipCode}</p>
-                                </div>
-                            `;
-                            addressList.appendChild(newAddress);
+                          
+                            location.reload();
                             shippingOverlay.style.display = 'none';
                             AddressForm.reset();
                         } else {

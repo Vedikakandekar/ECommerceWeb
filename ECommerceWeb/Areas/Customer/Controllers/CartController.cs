@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using System.Text.Json;
+using Microsoft.CodeAnalysis;
 
 namespace ECommerceWeb.Areas.Customer.Controllers
 {
@@ -99,10 +100,12 @@ namespace ECommerceWeb.Areas.Customer.Controllers
 
         public IActionResult Delete(int productId)
         {
-            if (productId == 0)
+            string currentLogedInUser = _userManager.GetUserId(User);
+            if (currentLogedInUser == null || productId == 0)
             {
                 return View("Error");
             }
+            
             Products product = _unitOfWork.Product.Get(u => u.Id == productId);
             if (product == null)
             {
@@ -113,6 +116,28 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             _unitOfWork.Save();
             return RedirectToAction("Index");
         }
+
+        public IActionResult DeleteAddress(int addressId)
+        {
+            string currentLogedInUser = _userManager.GetUserId(User);
+            if (currentLogedInUser == null || addressId == 0)
+            {
+                return View("Error");
+            }
+            
+            ShippingAddress address = _unitOfWork.ShippingAddress.Get(u => u.AddressId == addressId);
+            if (address == null)
+            {
+                return View("Error");
+            }
+           
+            _unitOfWork.ShippingAddress.Remove(address);
+            _unitOfWork.Save();
+            return RedirectToAction("Index");
+        }
+
+
+
 
         [HttpPost]
         public IActionResult AddAddress([FromBody] ShippingAddress model)
