@@ -1,0 +1,111 @@
+﻿@model OrderVM
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History</title>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .order-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+            .order-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            }
+
+        .order-image {
+            object-fit: cover;
+            height: 200px;
+            width: 300px;
+        }
+
+        .order-date {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .order-state {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .state-delivered {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .state-processing {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .state-shipped {
+            background-color: #17a2b8;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <header class="bg-primary text-white text-center py-3 mb-2 col-12 col-lg-10 mx-auto">
+            <h4 class="display-4">Your Orders</h4>
+            <p class="lead">Manage your Orders here..</p>
+        </header>
+        @if(@Model.orderItemsList.Count>0)
+        {
+          @for (int index = 0; index < Model.orderItemsList.Count; index++)
+            {
+              
+        <div class="col-12 col-lg-10 p-1 mx-auto">
+             <div class="card order-card">
+                    <div class="row g-0">
+                    <div class="col-md-4 position-relative">
+                            <img id="product-img" src="@Model.orderItemsList[index].Product.ImageUrl" class="order-image" alt="Image">
+                            <span id="orderDate" class="order-date">@Model.orderItemsList[index].Order.OrderDate</span>
+                            <span id="productStatus"  class="order-state state-delivered">Pending</span>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                                <h5 id="product-name" class="card-title">@Model.orderItemsList[index].Product.Name</h5>
+                                <p id="product-description" class="card-text">@Model.orderItemsList[index].Product.Description</p>
+                                <p id="product-quantity" class="card-text"><strong>Quantity:</strong> @Model.orderItemsList[index].Quantity</p>
+                                <p class="card-text" id="totalPrize"><strong>Total Price:</strong> $@Model.orderItemsList[index].TotalPrice</p>
+                            <p class="card-text">
+                                <strong>Shipping Address:</strong><br>
+                                    @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].FullName, @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].PhoneNumber<br>
+                                    @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].Street,  @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].City, @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].Country
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+            }
+        }
+    </div>
+                           
+</body>
+</html>

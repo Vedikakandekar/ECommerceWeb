@@ -6,9 +6,27 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-    </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @UserManager.GetUserName(User)
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                <li>
+                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Manage Profile</a>
+                </li>
+                @if (User.IsInRole("Customer"))
+                { 
+                    <li>
+                        <a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="Index">Show Orders</a>
+                    </li>
+                }
+                else if (User.IsInRole("Seller"))
+                {
+                    
+
+                }
+            </ul>
+        </li>
     <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
             <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
