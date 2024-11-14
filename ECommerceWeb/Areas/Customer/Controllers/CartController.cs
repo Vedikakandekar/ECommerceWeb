@@ -6,10 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using System.Text.Json;
 using Microsoft.CodeAnalysis;
+using ECommerce.Utility;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerceWeb.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = StaticDetails.Role_Customer)]
     public class CartController : Controller
     {
         private readonly ILogger<HomeController> _logger;

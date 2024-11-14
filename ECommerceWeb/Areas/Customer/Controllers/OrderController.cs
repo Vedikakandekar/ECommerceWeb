@@ -1,6 +1,8 @@
 ﻿using ECommerce.Data.Repository.IRepository;
 using ECommerce.Models;
 using ECommerce.Models.ViewModels;
+using ECommerce.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -9,6 +11,7 @@ using System.Text.Json;
 namespace ECommerceWeb.Areas.Customer.Controllers
 {
     [Area("Customer")]
+    [Authorize(Roles = StaticDetails.Role_Customer)]
     public class OrderController : Controller
     {
         private readonly ILogger<HomeController> _logger;

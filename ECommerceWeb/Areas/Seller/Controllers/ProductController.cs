@@ -12,24 +12,27 @@ namespace ECommerceWeb.Areas.Seller.Controllers
 {
     [Area("Seller")]
     [Authorize(Roles = StaticDetails.Role_Seller)]
-    public class ProductController
-        (IUnitOfWork unitOfWork,
-        IWebHostEnvironment _webHostEnvironment,
-        UserManager<User> userManager) : Controller
+    public class ProductController : Controller
     {
-        private readonly IUnitOfWork unitOfWork = unitOfWork;
-        private readonly IWebHostEnvironment _webHostEnvironment = _webHostEnvironment;
-        private readonly UserManager<User> _userManager = userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly UserManager<IdentityUser> _userManager;
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager)
+        {
+            _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
+            _userManager = userManager;
+        }
         public IActionResult Index()
         {
-            List<Products> products = unitOfWork.Product.GetAll(u => u.SellerId == _userManager.GetUserId(User), includeProperties: "Category,").ToList();
+            List<Products> products = _unitOfWork.Product.GetAll(u => u.SellerId == _userManager.GetUserId(User), includeProperties: "Category,").ToList();
             return View(products);
         }
         public IActionResult Upsert(int? id)
         {
             ProductVM productVM = new ProductVM()
             {
-                CategoryList = unitOfWork.Category.GetAll().ToList().Select(u => new SelectListItem
+                CategoryList = _unitOfWork.Category.GetAll().ToList().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
@@ -44,7 +47,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             }
             else
             {
-                productVM.Products = unitOfWork.Product.Get(u => u.Id == id);
+                productVM.Products = _unitOfWork.Product.Get(u => u.Id == id);
                 return View(productVM);
             }
         }
@@ -79,8 +82,8 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                 {
 
                     obj.Products.SellerId = _userManager.GetUserId(User);
-                    unitOfWork.Product.Add(obj.Products);
-                    unitOfWork.Save();
+                    _unitOfWork.Product.Add(obj.Products);
+                    _unitOfWork.Save();
                     TempData["success"] = "Product Created Successfully";
                     return RedirectToAction("Index", "Product");
                 }
@@ -90,8 +93,8 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                     {
                         return View("Error");
                     }
-                    unitOfWork.Product.Update(obj.Products);
-                    unitOfWork.Save();
+                    _unitOfWork.Product.Update(obj.Products);
+                    _unitOfWork.Save();
                     TempData["success"] = "Product Updated Successfully";
                     return RedirectToAction("Index", "Product");
                 }
@@ -106,12 +109,12 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             }
             ProductVM productVM = new ProductVM()
             {
-                CategoryList = unitOfWork.Category.GetAll().ToList().Select(u => new SelectListItem
+                CategoryList = _unitOfWork.Category.GetAll().ToList().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 }),
-                Products = unitOfWork.Product.Get(u => u.Id == id)
+                Products = _unitOfWork.Product.Get(u => u.Id == id)
             };
             if (productVM.Products != null)
             {
@@ -124,13 +127,13 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
-            Products? c = unitOfWork.Product.Get(u => u.Id == id);
+            Products? c = _unitOfWork.Product.Get(u => u.Id == id);
             if (c == null)
             {
                 return NotFound();
             }
-            unitOfWork.Product.Remove(c);
-            unitOfWork.Save();
+            _unitOfWork.Product.Remove(c);
+            _unitOfWork.Save();
             TempData["success"] = "Product Deleted Successfully";
             return RedirectToAction("Index", "Product"); //parameters = action name, controller name
         }
@@ -138,7 +141,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<Products> objProductList = unitOfWork.Product.GetAll(includeProperties: "Category").ToList();
+            List<Products> objProductList = _unitOfWork.Product.GetAll(includeProperties: "Category").ToList();
             return Json(new { data = objProductList });
         }
         #endregion
