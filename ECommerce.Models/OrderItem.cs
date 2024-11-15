@@ -40,5 +40,12 @@ namespace ECommerce.Models
         [ValidateNever]
         [ForeignKey("ProductId")]
         public virtual Products Product { get; set; }
+
+        [Required]
+        public int  StatusId { get; set; }
+
+        [ValidateNever]
+        [ForeignKey("StatusId")]
+        public virtual OrderItemStatus Status { get; set; }
     }
 }

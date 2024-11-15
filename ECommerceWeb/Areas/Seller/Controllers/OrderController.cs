@@ -28,7 +28,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
 
             string currentLoggedInUser = _userManager.GetUserId(User);
 
-            List<OrderItem> orderItemList = _unitOfWork.OrderItem.GetAll(oi => oi.Product.SellerId == currentLoggedInUser, includeProperties: "Product,Order" ).ToList();
+            List<OrderItem> orderItemList = _unitOfWork.OrderItem.GetAll(oi => oi.Product.SellerId == currentLoggedInUser, includeProperties: "Product,Order,Status" ).ToList();
 
             List<int> orderIds = orderItemList.Select(oi => oi.OrderId).Distinct().ToList();
 
@@ -42,5 +42,41 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             }
             return View(orderVM);
         }
+
+
+
+        [HttpGet]
+        public IActionResult UpdateStatus(int orderItemId, string status)
+        {
+            string currentLoggedInUser = _userManager.GetUserId(User);
+            if (currentLoggedInUser == null)
+            {
+                return BadRequest(new { success = false, message = "Seller Is Not Logged In" });
+            }
+            List<OrderItemStatus> statusList = _unitOfWork.OrderItemStatus.GetAll().ToList();
+          
+            if(statusList.Any(s => s.StatusName == status))
+            {
+                var orderItem = _unitOfWork.OrderItem.Get(oi => oi.OrderItemId == orderItemId);
+
+                if (orderItem == null)
+                {
+                    return BadRequest(new { success = false, message = "OrderItem Not Found" });
+                }
+                OrderItemStatus OrderStatus = _unitOfWork.OrderItemStatus.Get(u => u.StatusName == status);
+                orderItem.StatusId = OrderStatus.StatusId;
+                _unitOfWork.OrderItem.Update(orderItem);
+                _unitOfWork.Save();
+                return Json(new { success = true });
+            }
+
+
+
+
+            return BadRequest(new { success = false, message = "OrderItem Not Found" });
+
+        }
     }
+
+
 }

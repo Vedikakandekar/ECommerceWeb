@@ -8,17 +8,16 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Data.Repository
 {
-    public class OrderRepository : Repository<Order>, IOrderRepository
+    internal class OrderItemStatusRepository : Repository<OrderItemStatus>, IOrderItemStatusRepository
     {
         private ApplicationDbContext _db;
-        public OrderRepository(ApplicationDbContext db) : base(db)
+        public OrderItemStatusRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
         }
-        public void Update(Order entity)
+        public void Update(OrderItemStatus entity)
         {
-            _db.order.Update(entity);
+            _db.OrderItemStatus.Update(entity);
         }
     }
 }
-

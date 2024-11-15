@@ -21,6 +21,8 @@ namespace ECommerce.Data.Repository
 
         public ICartItemRepository CartItem { get; private set; }
 
+        public IOrderItemStatusRepository OrderItemStatus { get; private set; }
+
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -31,6 +33,7 @@ namespace ECommerce.Data.Repository
             Order = new OrderRepository(_db);
             OrderItem = new OrderItemRepository(_db);
             ShippingAddress = new ShippingAddressRepositoy(_db);
+            OrderItemStatus = new OrderItemStatusRepository(_db);
         }
         public void Save()
         {

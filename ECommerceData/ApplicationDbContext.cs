@@ -18,6 +18,7 @@ namespace ECommerce.Data
 
         public DbSet<ShippingAddress> ShippingAddress { get; set; }
 
+        public DbSet<OrderItemStatus> OrderItemStatus { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -41,10 +42,10 @@ namespace ECommerce.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Order>()
-              .HasMany(o => o.OrderItems)
-              .WithOne(oi => oi.Order)
-              .HasForeignKey(oi => oi.OrderId)
-              .OnDelete(DeleteBehavior.Cascade);
+                .HasMany(o => o.OrderItems)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<OrderItem>()
                 .HasOne(oi => oi.Order)

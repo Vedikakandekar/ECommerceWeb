@@ -51,18 +51,33 @@
             font-weight: bold;
         }
 
-        .state-delivered {
+        .state-pending {
+            background-color: #ffc107; 
+            color: black;
+        }
+
+        .state-processed {
+            background-color: #17a2b8; 
+            color: white;
+        }
+
+        .state-shipped {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .state-out-for-delivery {
             background-color: #28a745;
             color: white;
         }
 
-        .state-processing {
-            background-color: #ffc107;
-            color: black;
+        .state-delivered {
+            background-color: #28a745; 
+            color: white;
         }
 
-        .state-shipped {
-            background-color: #17a2b8;
+        .state-cancelled {
+            background-color: #dc3545; 
             color: white;
         }
     </style>
@@ -84,7 +99,16 @@
                     <div class="col-md-4 position-relative">
                             <img id="product-img" src="@Model.orderItemsList[index].Product.ImageUrl" class="order-image" alt="Image">
                             <span id="orderDate" class="order-date">@Model.orderItemsList[index].Order.OrderDate</span>
-                            <span id="productStatus"  class="order-state state-delivered">Pending</span>
+                                <span id="productStatus"
+                                      class="order-state
+                                      @(Model.orderItemsList[index].Status.StatusName == "Pending" ? "state-pending" :
+                                        Model.orderItemsList[index].Status.StatusName == "Processed" ? "state-processed" :
+                                        Model.orderItemsList[index].Status.StatusName == "Shipped" ? "state-shipped" :
+                                        Model.orderItemsList[index].Status.StatusName == "Out for Delivery" ? "state-out-for-delivery" :
+                                        Model.orderItemsList[index].Status.StatusName == "Delivered" ? "state-delivered" :
+                                        Model.orderItemsList[index].Status.StatusName == "Cancelled" ? "state-cancelled" : "")">
+                                        @Model.orderItemsList[index].Status.StatusName
+                                </span>
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">

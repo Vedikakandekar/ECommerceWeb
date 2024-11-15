@@ -11,7 +11,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
 {
 
     [Area("Customer")]
-    [Authorize(Roles = StaticDetails.Role_Customer)]
+  
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

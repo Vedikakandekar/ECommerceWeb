@@ -32,7 +32,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             }
             List<Order> orderList = _unitOfWork.Order.GetAll(u=>u.customerId==currentLoggedInUser).ToList();
            // List<OrderItem> orderItemList = _unitOfWork.OrderItem.GetAll( oi=> orderList.Select(o => o.OrderId==oi.OrderId),"Product,Order").ToList();
-            List<OrderItem> orderItemList = _unitOfWork.OrderItem.GetAll(oi => orderList.Select(o => o.OrderId).Contains(oi.OrderId),"Product,Order").ToList();
+            List<OrderItem> orderItemList = _unitOfWork.OrderItem.GetAll(oi => orderList.Select(o => o.OrderId).Contains(oi.OrderId), "Product,Order,Status").ToList();
             var orderShippingAddresses = orderList.ToDictionary(o => o.OrderId,o => JsonSerializer.Deserialize<ShippingAddress>(o.AddressId));
 
             OrderVM orderVM = new OrderVM();

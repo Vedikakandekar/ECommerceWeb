@@ -79,7 +79,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                     orderItem.UnitPrice = (decimal)listItem.Product.Price;
                     orderItem.TotalPrice = listItem.Quantity * (decimal)listItem.Product.Price;
                     orderItem.ProductId = listItem.ProductId;
-
+                    orderItem.StatusId = _unitOfWork.OrderItemStatus.Get(u => u.StatusName == "Pending").StatusId;
                     _unitOfWork.OrderItem.Add(orderItem);
                     _unitOfWork.Save();
                 }
