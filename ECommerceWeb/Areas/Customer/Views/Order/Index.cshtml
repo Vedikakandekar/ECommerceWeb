@@ -99,7 +99,7 @@
                     <div class="col-md-4 position-relative">
                             <img id="product-img" src="@Model.orderItemsList[index].Product.ImageUrl" class="order-image" alt="Image">
                             <span id="orderDate" class="order-date">@Model.orderItemsList[index].Order.OrderDate</span>
-                                <span id="productStatus"
+                                <span id="productStatus+@Model.orderItemsList[index].OrderItemId"
                                       class="order-state
                                       @(Model.orderItemsList[index].Status.StatusName == "Pending" ? "state-pending" :
                                         Model.orderItemsList[index].Status.StatusName == "Processed" ? "state-processed" :
@@ -130,6 +130,48 @@
             }
         }
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/orderStatusHub")
+            .build();
+            debugger
+        connection.on("ReceiveStatusUpdate", function (status,orderItemId,ProductName) {
+            alert("Your Order "+ProductName+" status has been updated to: " + status);
+            document.getElementById("productStatus+"+orderItemId).textContent = status;
+            updateStatusClass(status);
+        });
+
+        connection.start().catch(function (err) {
+            return Console.error(err.toString());
+        });
+        function updateStatusClass(status) {
+            const statusSpan = document.getElementById("productStatus+"+orderItemId);
+            statusBadge.className = 'badge status-badge';// Remove previous classes
+            switch (status) {
+                case "Pending":
+                    statusSpan.classList.add("state-pending");
+                    break;
+                case "Processed":
+                    statusSpan.classList.add("state-processed");
+                    break;
+                case "Shipped":
+                    statusSpan.classList.add("state-shipped");
+                    break;
+                case "Out for Delivery":
+                    statusSpan.classList.add("state-out-for-delivery");
+                    break;
+                case "Delivered":
+                    statusSpan.classList.add("state-delivered");
+                    break;
+                case "Cancelled":
+                    statusSpan.classList.add("state-cancelled");
+                    break;
+            }
+        }
+    </script>
                            
 </body>
 </html>
+

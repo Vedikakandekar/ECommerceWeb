@@ -5,6 +5,7 @@ using ECommerce.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 
 namespace ECommerceWeb.Areas.Seller.Controllers
@@ -16,12 +17,14 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IHubContext<OrderStatusChangedHub> _hubContext;
 
-        public OrderController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager)
+        public OrderController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager,IHubContext<OrderStatusChangedHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
             _userManager = userManager;
+            _hubContext = hubContext;   
         }
         public IActionResult Index()
         {
@@ -46,7 +49,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
 
 
         [HttpGet]
-        public IActionResult UpdateStatus(int orderItemId, string status)
+        public async Task<IActionResult> UpdateStatus(int orderItemId, string status)
         {
             string currentLoggedInUser = _userManager.GetUserId(User);
             if (currentLoggedInUser == null)
@@ -57,7 +60,7 @@ namespace ECommerceWeb.Areas.Seller.Controllers
           
             if(statusList.Any(s => s.StatusName == status))
             {
-                var orderItem = _unitOfWork.OrderItem.Get(oi => oi.OrderItemId == orderItemId);
+                var orderItem = _unitOfWork.OrderItem.Get(oi => oi.OrderItemId == orderItemId,includeProperties:"Order,Product");
 
                 if (orderItem == null)
                 {
@@ -67,6 +70,10 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                 orderItem.StatusId = OrderStatus.StatusId;
                 _unitOfWork.OrderItem.Update(orderItem);
                 _unitOfWork.Save();
+
+                string customerId = orderItem.Order.customerId;
+                await _hubContext.Clients.User(customerId).SendAsync("ReceiveStatusUpdate",status,orderItem.OrderItemId,orderItem.Product.Name);
+
                 return Json(new { success = true });
             }
 

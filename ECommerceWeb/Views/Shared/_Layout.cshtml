@@ -48,22 +48,116 @@
                         @if (User.IsInRole(StaticDetails.Role_Customer))
                         {
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Customer" asp-controller="Order" asp-action="Index">Orders</a>
+                            </li>
+
+                            <li>
 
                                 <a class="nav-link text-dark" asp-area="Customer" asp-controller="Cart" asp-action="Index"> <i  class="bi bi-cart4"></i></a>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="#" id="notificationIcon" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                                    <i class="bi bi-bell-fill fs-5"></i>
+                                    <span class="notification-badge" id="notificationBadge"></span>
+                                </a>
+                            </li>
                         }
                     </ul>
+                        
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
+        <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="notificationModalLabel">Notifications</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="notificationList">
+                        <!-- Notifications will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             <partial name="_Notifications" />
             @RenderBody()
         </main>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/orderStatusHub")
+            .build();
+        debugger
+        connection.on("ReceiveStatusUpdate", function (status, orderItemId, ProductName) {
+            addNotification("Your Product " + ProductName + " is : " + status);
+
+        });
+
+        connection.start().catch(function (err) {
+            return Console.error(err.toString());
+        });
+        let notifications = [];
+        let notificationCount = 0;
+
+        function addNotification(message) {
+            const notification = {
+                id: Date.now(),
+                message: message,
+                time: new Date().toLocaleString(),
+                read: false
+            };
+            notifications.unshift(notification);
+            updateNotificationBadge();
+            updateNotificationList();
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            notificationCount = notifications.filter(n => !n.read).length;
+
+            if (notificationCount > 0) {
+                badge.textContent = notificationCount;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function updateNotificationList() {
+            const notificationList = document.getElementById('notificationList');
+            notificationList.innerHTML = '';
+
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('div');
+                notificationItem.className = 'notification-item';
+                notificationItem.innerHTML = `
+                    <p class="mb-0"><strong>${notification.message}</strong></p>
+                    <small class="text-muted">${notification.time}</small>
+                `;
+                notificationList.appendChild(notificationItem);
+            });
+        }
+
+        document.getElementById('notificationIcon').addEventListener('click', () => {
+            notifications.forEach(notification => {
+                notification.read = true;
+            });
+            updateNotificationBadge();
+        });
+    </script>
+
+
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2024 - ECommerceWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -72,6 +166,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     <script src="//cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
