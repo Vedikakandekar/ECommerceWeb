@@ -1,38 +1,76 @@
 ﻿@model IEnumerable<Products>
 
-
-<div class="row pb-3">
-    @foreach (var product in Model)
-    {
-        <div class="col-lg-3 col-sm-6">
-            <div class="row p-2">
-                <div class="col-12 p-1">
-                    <div class="card border-0 p-3 shadow  border-top border-5 rounded">
-                        <img src="@product.ImageUrl" class="card-img-top rounded" />
-                        <div class="card-body pb-0">
-                            <div class="pl-1">
-                                <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@product.Name</p>
-
-                            </div>
-                            <div class="pl-1">
-                                <p class="text-dark text-opacity-75 text-center mb-0">
-                                    Price:
-                                    <span class="text-dark text-opacity-75 text-center">
-                                        @product.Price.ToString("c")
-                                    </span>
-                                </p>
-                            </div>
+<template id="product-template">
+    <div class="col-lg-3 col-sm-6">
+        <div class="row p-2">
+            <div class="col-12 p-1">
+                <div class="card border-0 p-3 shadow border-top border-5 rounded card-hover-effect">
+                    <div style="height: 200px; display: flex; justify-content: center; align-items: center; overflow: hidden;" class="align-middle">
+                        <img src="" class="card-img-top" style="object-fit: cover; height: 100%; width: auto;" alt="Product Image" />
+                    </div>
+                    <div class="card-body pb-0">
+                        <div class="pl-1">
+                            <p class="card-title h5 text-dark opacity-75 text-uppercase text-center"></p>
                         </div>
-                        <div>
-                            <a asp-action="Details"
-                               asp-route-productId="@product.Id"
-                               class="btn btn-primary bg-gradient border-0 form-control">
-                                Details
-                            </a>
+                        <div class="pl-1">
+                            <p class="text-dark text-opacity-75 text-center mb-0">
+                                Price: <span class="text-dark text-opacity-75 text-center"></span>
+                            </p>
                         </div>
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-primary bg-gradient border-0 form-control">Details</a>
                     </div>
                 </div>
             </div>
         </div>
-    }
+    </div>
+</template>
+
+<div class="row pb-3" id="products-container">
 </div>
+
+<style>
+    /* Hover effect styles */
+    .card-hover-effect {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card-hover-effect:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const products = @Html.Raw(Json.Serialize(Model)); 
+        const container = document.getElementById('products-container');
+        const template = document.getElementById('product-template').content;
+
+        products.forEach(product => {
+            const clone = template.cloneNode(true);
+
+            const img = clone.querySelector('img');
+            img.src = product.imageUrl.replace(/\\/g, '/'); 
+            img.alt = product.name;
+            img.id = `product-image-${product.id}`;
+
+            const name = clone.querySelector('.card-title');
+            name.textContent = product.name || 'Unnamed Product'; 
+            name.id = `product-name-${product.id}`;
+
+            const price = clone.querySelector('span');
+            const priceValue = product.price;
+            price.textContent = priceValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            price.id = `product-price-${product.id}`;
+
+            const detailsButton = clone.querySelector('a');
+            detailsButton.href = `/Customer/Home/Details?productId=${product.id}`;
+            detailsButton.id = `details-button-${product.id}`;
+
+            container.appendChild(clone);
+        });
+    });
+</script>
+

@@ -19,19 +19,19 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IHubContext<OrderStatusChangedHub> _hubContext;
 
-        public OrderController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager,IHubContext<OrderStatusChangedHub> hubContext)
+        public OrderController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager, IHubContext<OrderStatusChangedHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
             _userManager = userManager;
-            _hubContext = hubContext;   
+            _hubContext = hubContext;
         }
         public IActionResult Index()
         {
 
             string currentLoggedInUser = _userManager.GetUserId(User);
 
-            List<OrderItem> orderItemList = _unitOfWork.OrderItem.GetAll(oi => oi.Product.SellerId == currentLoggedInUser, includeProperties: "Product,Order,Status" ).ToList();
+            List<OrderItem> orderItemList = _unitOfWork.OrderItem.GetAll(oi => oi.Product.SellerId == currentLoggedInUser, includeProperties: "Product,Order,Status").ToList();
 
             List<int> orderIds = orderItemList.Select(oi => oi.OrderId).Distinct().ToList();
 
@@ -57,30 +57,32 @@ namespace ECommerceWeb.Areas.Seller.Controllers
                 return BadRequest(new { success = false, message = "Seller Is Not Logged In" });
             }
             List<OrderItemStatus> statusList = _unitOfWork.OrderItemStatus.GetAll().ToList();
-          
-            if(statusList.Any(s => s.StatusName == status))
+
+            if (!statusList.Any(s => s.StatusName == status))
             {
-                var orderItem = _unitOfWork.OrderItem.Get(oi => oi.OrderItemId == orderItemId,includeProperties:"Order,Product");
+                return BadRequest(new { success = false, message = "Status Not Found" });
+            }
+            var orderItem = _unitOfWork.OrderItem.Get(oi => oi.OrderItemId == orderItemId, includeProperties: "Order,Product");
 
-                if (orderItem == null)
-                {
-                    return BadRequest(new { success = false, message = "OrderItem Not Found" });
-                }
-                OrderItemStatus OrderStatus = _unitOfWork.OrderItemStatus.Get(u => u.StatusName == status);
-                orderItem.StatusId = OrderStatus.StatusId;
-                _unitOfWork.OrderItem.Update(orderItem);
-                _unitOfWork.Save();
-
-                string customerId = orderItem.Order.customerId;
-                await _hubContext.Clients.User(customerId).SendAsync("ReceiveStatusUpdate",status,orderItem.OrderItemId,orderItem.Product.Name);
-
-                return Json(new { success = true });
+            if (orderItem == null)
+            {
+                return BadRequest(new { success = false, message = "OrderItem Not Found" });
+            }
+            var currentStatus = _unitOfWork.OrderItemStatus.Get(s => s.StatusId == orderItem.StatusId)?.StatusName;
+            if (currentStatus == "Delivered" || currentStatus == "Cancelled")
+            {
+                return BadRequest(new { success = false, message = $"Status cannot be changed as it is already {currentStatus}" });
             }
 
+            OrderItemStatus OrderStatus = _unitOfWork.OrderItemStatus.Get(u => u.StatusName == status);
+            orderItem.StatusId = OrderStatus.StatusId;
+            _unitOfWork.OrderItem.Update(orderItem);
+            _unitOfWork.Save();
 
-
-
-            return BadRequest(new { success = false, message = "OrderItem Not Found" });
+            string customerId = orderItem.Order.customerId;
+            await _hubContext.Clients.User(customerId).SendAsync("ReceiveStatusNotification", status, orderItem.OrderItemId, orderItem.Product.Name);
+            await _hubContext.Clients.User(customerId).SendAsync("ReceiveStatusUpdate", status, orderItem.OrderItemId, orderItem.Product.Name);
+            return Json(new { success = true });
 
         }
     }

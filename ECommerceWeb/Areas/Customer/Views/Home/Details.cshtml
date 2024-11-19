@@ -2,11 +2,11 @@
 
 <form method="post">
     <div class="card shadow border-0 mt-4 mb-4">
-        <div class="card-header bg-secondary bg-gradient text-light py-4">
+        <div class="card-header  bg-primary text-white text-center bg-gradient text-nlack py-4">
             <div class="row">
-                <div class="col-12 text-center">
-                    <h3 class="text-white text-uppercase">@Model.item.Product.Name</h3>
-                    @*  <p class="text-white-50 fw-semibold mb-0">Category @Model.Category.Name</p> *@
+                <div class="col-12 bg-primary text-white text-center">
+                    <h3 class="bg-primary text-white text-center text-uppercase">@Model.item.Product.Name</h3>
+                   
                 </div>
             </div>
         </div>
@@ -29,8 +29,9 @@
                 <div class="row">
                     <div class="col-12 col-lg-3 offset-lg-1 text-center mb-3">
                         
-
-                        <img src="@Model.item.Product.ImageUrl" width="100%" class="rounded" />
+                        <div style="height:200px; display:flex; justify-content:center; align-items:center;" class="align-middle">
+                            <img src="@Model.item.Product.ImageUrl" class="card-img-top" alt="@Model.item.Product.Name" style="object-fit:cover;" />
+                        </div>
                     </div>
                     <div class="col-12 col-lg-6 offset-lg-1">
                         <div class="col-12 col-md-6 pb-4">

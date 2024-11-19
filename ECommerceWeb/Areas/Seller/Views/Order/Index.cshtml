@@ -100,7 +100,7 @@
                                             <option value="Delivered">Delivered</option>
                                             <option value="Cancelled">Cancelled</option>
                                         </select>
-                                        <button class="btn btn-primary btn-sm w-100" data-orderItemId="@Model.orderItemsList[index].OrderItemId">Update Status</button>
+                                        <button class="btn btn-primary btn-sm w-100" onclick="updateOrderStatus(this, @Model.orderItemsList[index].OrderItemId)">Update Status</button>
                                     </div>
                                 </div>
                             </div>
@@ -117,16 +117,28 @@
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const statusUpdates = document.querySelectorAll('.btn-primary');
-            statusUpdates.forEach(button => {
-                button.addEventListener('click', function () {
-                    const select = this.previousElementSibling;
-                    const newStatus = select.value;
-                    const orderItemId = $(this).data('orderitemid');
-                    if (newStatus !== 'Update status') {
-                        debugger
-                        const statusBadge = this.parentElement.querySelector('.status-badge');
+        function updateOrderStatus(button, orderItemId) {
+            const select = button.previousElementSibling;
+            const newStatus = select.value;
+
+            if (newStatus === 'Update status') {
+                alert('Please select a valid status.');
+                return;
+            }
+
+            const url = `/seller/order/updatestatus?orderItemId=${encodeURIComponent(orderItemId)}&status=${encodeURIComponent(newStatus)}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to update status');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const statusBadge = button.parentElement.querySelector('.status-badge');
                         statusBadge.textContent = newStatus;
 
                         statusBadge.className = 'badge status-badge';
@@ -141,8 +153,6 @@
                                 statusBadge.classList.add('bg-primary');
                                 break;
                             case 'Out for Delivery':
-                                statusBadge.classList.add('bg-success');
-                                break;
                             case 'Delivered':
                                 statusBadge.classList.add('bg-success');
                                 break;
@@ -150,42 +160,16 @@
                                 statusBadge.classList.add('bg-danger');
                                 break;
                         }
-                        debugger
-                        select.selectedIndex = 0;
-                        debugger
-                        const url = `/seller/order/updatestatus?orderItemId=${encodeURIComponent(orderItemId)}&status=${encodeURIComponent(newStatus)}`;
-
-                        fetch(url, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                            .then(response => {
-
-                                if (!response.ok) {
-                                    console.log('Status Not updated got error:', data);
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-
-                                if (data.success) {
-                                    console.log('Status updated successfully!');
-
-                                } else {
-                                    console.log('Status update failed');
-
-                                }
-                            })
-                            .catch(error => {
-
-                                console.error('Error:', error);
-                            });
+                        alert('Status updated successfully!');
+                    } else {
+                        alert('Failed to update status.');
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating status.');
                 });
-            });
-        });
+        }
     </script>
 </body>
 </html>

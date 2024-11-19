@@ -98,8 +98,8 @@
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/orderStatusHub")
             .build();
-        debugger
-        connection.on("ReceiveStatusUpdate", function (status, orderItemId, ProductName) {
+        
+        connection.on("ReceiveStatusNotification", function (status, orderItemId, ProductName) {
             addNotification("Your Product " + ProductName + " is : " + status);
 
         });
@@ -149,12 +149,22 @@
             });
         }
 
-        document.getElementById('notificationIcon').addEventListener('click', () => {
-            notifications.forEach(notification => {
-                notification.read = true;
-            });
-            updateNotificationBadge();
+
+          document.getElementById('notificationIcon').addEventListener('click', () => {
+        console.log("Notification icon clicked, modal opened");
+      
+    });
+
+         document.getElementById('notificationModal').addEventListener('hidden.bs.modal', () => {
+        console.log("Notification modal closed, marking notifications as read");
+        notifications.forEach(notification => {
+            notification.read = true; 
         });
+        updateNotificationBadge(); 
+    });
+
+            updateNotificationBadge();
+     
     </script>
 
 
