@@ -1,4 +1,5 @@
-﻿@model OrderVM
+﻿@using Newtonsoft.Json
+@model OrderVM
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +89,124 @@
             <h4 class="display-4">Your Orders</h4>
          
         </header>
-        @if(@Model.orderItemsList.Count>0)
+
+
+
+        <template id="order-template">
+            <div class="col-12 col-lg-10 p-1 mx-auto">
+                <div class="card order-card">
+                    <div class="row g-0">
+                        <div class="col-md-4 position-relative">
+                            <img class="order-image" alt="Image">
+                            <span class="order-date"></span>
+                            <span class="order-state"></span>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title"></h5>
+                                <p class="card-text description"></p>
+                                <p class="card-text quantity"></p>
+                                <p class="card-text total-price"></p>
+                                <p class="card-text shipping-address"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Orders will be appended here -->
+        <div id="order-list"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script>
+           const orders = @Html.Raw(JsonConvert.SerializeObject(Model.orderItemsList, new JsonSerializerSettings{ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
+            const shippingAddresses = @Html.Raw(JsonConvert.SerializeObject(Model.OrderShippingAddresses));
+
+                $(document).ready(function () {
+                    const orderTemplate = document.querySelector('#order-template').content;
+                    const orderList = $('#order-list');
+
+                    orders.forEach(orderItem => {
+                        const clone = $(orderTemplate).clone();
+
+                        clone.find('.order-image').attr('src', orderItem.Product.ImageUrl);
+                        clone.find('.order-date').text(orderItem.Order.OrderDate);
+                        clone.find('.order-state')
+                            .addClass(getStateClass(orderItem.Status.StatusName))
+                            .attr('id', `productStatus+${orderItem.OrderItemId}`)
+                            .text(orderItem.Status.StatusName);
+
+                        clone.find('.card-title').text(orderItem.Product.Name);
+                        clone.find('.description').text(orderItem.Product.Description);
+                        clone.find('.quantity').text(`Quantity: ${orderItem.Quantity}`);
+                        clone.find('.total-price').text(`Total Price: $${orderItem.TotalPrice}`);
+                        clone.find('.shipping-address').html(`
+                            <strong>Shipping Address:</strong><br>
+                            ${shippingAddresses[orderItem.Order.OrderId].FullName}, ${shippingAddresses[orderItem.Order.OrderId].PhoneNumber}<br>
+                            ${shippingAddresses[orderItem.Order.OrderId].Street}, ${shippingAddresses[orderItem.Order.OrderId].City}, ${shippingAddresses[orderItem.Order.OrderId].Country}
+                        `);
+
+                        orderList.append(clone);
+                    });
+
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl("/orderStatusHub")
+                    .build();
+
+                connection.on("ReceiveStatusUpdate", function (status, orderItemId, productName) {
+                    alert(`Your Order ${productName} status has been updated to: ${status}`);
+                    const statusSpan = document.getElementById(`productStatus+${orderItemId}`);
+                    statusSpan.textContent = status;
+                    updateStatusClass(statusSpan, status);
+                });
+
+                connection.start().catch(err => console.error(err.toString()));
+
+                function updateStatusClass(statusSpan, status) {
+                    statusSpan.className = 'order-state'; // Reset classes
+                    statusSpan.classList.add(getStateClass(status));
+                }
+
+                function getStateClass(status) {
+                    switch (status) {
+                        case "Pending": return "state-pending";
+                        case "Processed": return "state-processed";
+                        case "Shipped": return "state-shipped";
+                        case "Out for Delivery": return "state-out-for-delivery";
+                        case "Delivered": return "state-delivered";
+                        case "Cancelled": return "state-cancelled";
+                        default: return "";
+                    }
+                }
+            });
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @*     @if(@Model.orderItemsList.Count>0)
         {
           @for (int index = 0; index < Model.orderItemsList.Count; index++)
             {
@@ -128,11 +246,11 @@
             
         </div>
             }
-        }
+        } *@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
-    <script>
+   @*  <script>
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/orderStatusHub")
             .build();
@@ -170,7 +288,7 @@
                     break;
             }
         }
-    </script>
+    </script> *@
                            
 </body>
 </html>

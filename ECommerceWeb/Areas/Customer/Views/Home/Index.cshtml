@@ -1,12 +1,35 @@
-﻿@model IEnumerable<Products>
-
+﻿@model AllProductsVM
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-5">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search products">
+        </div>
+       
+        <div class="col-md-3">
+            <select id="category-filter" asp-items="@Model.CategoryList" class="form-select">
+                <option selected>-Select Category-</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="price-filter" class="form-select">
+                <option>-Sort by Price-</option>
+                <option value="low-to-high">Low to High</option>
+                <option value="high-to-low">High to Low</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="button" id="searchBtn" class="btn btn-primary btn-sm form-control">Apply</button>
+            <button type="button" id="resetBtn" class="btn btn-primary btn-sm form-control" style="display:none;"><i class="bi bi-arrow-counterclockwise" ></i>Clear</button>
+        </div>
+    </div>
+</div>
 <template id="product-template">
     <div class="col-lg-3 col-sm-6">
         <div class="row p-2">
             <div class="col-12 p-1">
                 <div class="card border-0 p-3 shadow border-top border-5 rounded card-hover-effect">
                     <div style="height: 200px; display: flex; justify-content: center; align-items: center; overflow: hidden;" class="align-middle">
-                        <img src="" class="card-img-top" style="object-fit: cover; height: 100%; width: auto;" alt="Product Image" />
+                        <img src="" class="card-img-top" alt="Product Image" />
                     </div>
                     <div class="card-body pb-0">
                         <div class="pl-1">
@@ -29,9 +52,12 @@
 
 <div class="row pb-3" id="products-container">
 </div>
-
+<nav aria-label="Product pagination" class="mt-4">
+    <ul class="pagination justify-content-center" id="pagination">
+    </ul>
+</nav>
 <style>
-    /* Hover effect styles */
+
     .card-hover-effect {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
@@ -41,36 +67,129 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 </style>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const products = @Html.Raw(Json.Serialize(Model)); 
-        const container = document.getElementById('products-container');
-        const template = document.getElementById('product-template').content;
+    $(document).ready(function () {
+        debugger
+        const products = @Html.Raw(Json.Serialize(Model.ProductList));
+        const itemsPerPage = 12;
+        let currentPage = 1;
+        let filteredProducts = [...products];
+        let AllProducts = [...products];
+        function renderProducts(page) {
+            debugger
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageProducts = filteredProducts.slice(start, end);
+            const $container = $('#products-container');
+            const $template = $('#product-template').html();
+            $('#products-container').empty();
 
-        products.forEach(product => {
-            const clone = template.cloneNode(true);
+            $.each(pageProducts, function (index, product) {
+                const $clone = $($template);
 
-            const img = clone.querySelector('img');
-            img.src = product.imageUrl.replace(/\\/g, '/'); 
-            img.alt = product.name;
-            img.id = `product-image-${product.id}`;
+                const $img = $clone.find('img');
+                $img.attr('src', product.imageUrl.replace(/\\/g, '/'));
+                $img.attr('alt', product.name);
+                $img.attr('id', `product-image-${product.id}`);
 
-            const name = clone.querySelector('.card-title');
-            name.textContent = product.name || 'Unnamed Product'; 
-            name.id = `product-name-${product.id}`;
+                const $name = $clone.find('.card-title');
+                $name.text(product.name || 'Unnamed Product');
+                $name.attr('id', `product-name-${product.id}`);
 
-            const price = clone.querySelector('span');
-            const priceValue = product.price;
-            price.textContent = priceValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            price.id = `product-price-${product.id}`;
+                const $price = $clone.find('span');
+                const priceValue = product.price;
+                $price.text(priceValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+                $price.attr('id', `product-price-${product.id}`);
 
-            const detailsButton = clone.querySelector('a');
-            detailsButton.href = `/Customer/Home/Details?productId=${product.id}`;
-            detailsButton.id = `details-button-${product.id}`;
+                const $detailsButton = $clone.find('a');
+                $detailsButton.attr('href', `/Customer/Home/Details?productId=${product.id}`);
+                $detailsButton.attr('id', `details-button-${product.id}`);
 
-            container.appendChild(clone);
+                $container.append($clone);
+            });
+
+            renderPagination();
+        }
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            $('#pagination').empty();
+
+            for (let i = 1; i <= totalPages; i++) {
+                $('#pagination').append(`
+                                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                                    </li>
+                                `);
+            }
+        }
+
+
+        $(document).on('click', '.pagination .page-link', function (e) {
+            e.preventDefault();
+            currentPage = parseInt($(this).data('page'));
+            renderProducts(currentPage);
         });
+        renderProducts(currentPage);
+
+        $('#searchBtn').on('click', function () {
+            let searchTearm = $('#searchInput').val();
+            let category = $('#category-filter').val();
+            let price = $('#price-filter').val();
+          
+            if (searchTearm.trim() != '' || category != "-Select Category-" || price != "-Sort by Price-") {
+                debugger
+                $(this).hide();
+                $('#resetBtn').show();
+                $('#price-filter').prop('disabled', true);
+                $('#category-filter').prop('disabled', true);
+                $('#searchInput').prop('disabled', true);
+                if (category === "-Select Category-") {
+                    category = "";
+                }
+                if (price === "-Sort by Price-") {
+                    price = "";
+                }
+                $.ajax({
+                    url: '/customer/home/SearchProduct',
+                    type: 'GET',
+                    data: {
+                        searchString: searchTearm,
+                        categoryFilter: category,
+                        priceFilter: price
+                    },
+                    datatype: 'json',
+                    success: function (data) {
+                        if (data.success) {
+
+                            console.log(data);
+
+                            filteredProducts = data.products;
+                            renderProducts(currentPage);
+                        }
+
+                    },
+                    error: function (jqXHR, textStatus, err) {
+                        console.log("AJX Error : ", textStatus, err)
+                    }
+
+                });
+            }
+
+        });
+
+        $('#resetBtn').click(function () {
+            $(this).hide();
+            $('#searchInput').val('');
+            $('#searchBtn').show();
+            $('#price-filter').prop('disabled', false);
+            $('#category-filter').prop('disabled', false);
+            $('#searchInput').prop('disabled', false);
+            $('#price-filter').prop('selectedIndex', 0);
+            $('#category-filter').prop('selectedIndex', 0);
+            filteredProducts = AllProducts;
+            renderProducts(currentPage);
+        });
+
     });
 </script>
-

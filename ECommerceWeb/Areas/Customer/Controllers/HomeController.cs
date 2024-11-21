@@ -5,13 +5,14 @@ using ECommerce.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
 
 namespace ECommerceWeb.Areas.Customer.Controllers
 {
 
     [Area("Customer")]
-  
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -25,8 +26,15 @@ namespace ECommerceWeb.Areas.Customer.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Products> productList = _unitOfWork.Product.GetAll(includeProperties: "Category");
-            return View(productList);
+            AllProductsVM productVM = new AllProductsVM();
+            List<Products> productList = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category").ToList();
+            productVM.ProductList = productList;
+            productVM.CategoryList = _unitOfWork.Category.GetAll().ToList().Select(x => x.Name).Select(i => new SelectListItem
+            {
+                Text = i,
+                Value = i
+            });
+            return View(productVM);
         }
         public IActionResult Privacy()
         {
@@ -95,7 +103,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                     _unitOfWork.Cart.Add(cartVM.cart);
                     _unitOfWork.Save();
                     Cart newCart = _unitOfWork.Cart.Get(u => u.CustomerId == cartVM.cart.CustomerId);
-                   
+
                     if (newCart != null)
                     {
                         cartVM.item.CartId = newCart.CartId;
@@ -106,9 +114,9 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                         return View("Error");
                 }
                 else
-                    if ( oldCart.CartId != 0)
+                    if (oldCart.CartId != 0)
                 {
-                    
+
                     cartVM.item.CartId = oldCart.CartId;
                     _unitOfWork.CartItem.Add(cartVM.item);
                     _unitOfWork.Save();
@@ -119,6 +127,36 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             return View("Error");
         }
 
+        public IActionResult SearchProduct(string searchString, string categoryFilter, string priceFilter)
+        {
+            if (string.IsNullOrWhiteSpace(searchString) && string.IsNullOrEmpty(categoryFilter) && string.IsNullOrEmpty(priceFilter))
+            {
+                return Json(new EmptyResult());
+            }
+            List<Products> FilteredProducts;
+            List<Products> ProductList = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category").ToList();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                 FilteredProducts = ProductList.Where(product => product.Name != null && product.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            else
+            {
+                FilteredProducts = ProductList;
+            }
+            if (!string.IsNullOrEmpty(categoryFilter))
+            {
+                FilteredProducts = FilteredProducts.Where(u => u.Category.Name.Contains(categoryFilter)).ToList();
+            }
+            if (priceFilter == "low-to-high")
+            {
+                FilteredProducts = FilteredProducts.OrderBy(u => u.Price).ToList();
+            }
+            if (priceFilter == "high-to-low")
+            {
+                FilteredProducts = FilteredProducts.OrderByDescending(u => u.Price).ToList();
+            }
+            return Json(new { success = true, products = FilteredProducts });
+        }
 
 
     }

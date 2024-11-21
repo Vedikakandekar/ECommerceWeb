@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.Text.Json.Serialization;
 
 namespace ECommerce.Models
 {
@@ -33,6 +34,7 @@ namespace ECommerce.Models
 
         // Navigation property to OrderItems
         [ValidateNever]
+      //  [JsonIgnore]
         public virtual ICollection<OrderItem> OrderItems { get; set; }
 
         public Order()

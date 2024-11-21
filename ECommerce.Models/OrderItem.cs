@@ -30,6 +30,7 @@ namespace ECommerce.Models
         public int OrderId { get; set; }
 
         [ValidateNever]
+        
         [ForeignKey("OrderId")]
         public virtual Order Order { get; set; }
 
