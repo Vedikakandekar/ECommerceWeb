@@ -1,10 +1,12 @@
-﻿using ECommerce.Data.Repository.IRepository;
+﻿using ECommerce.Data.Repository;
+using ECommerce.Data.Repository.IRepository;
 using ECommerce.Models;
 using ECommerce.Models.ViewModels;
 using ECommerce.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net;
 using System.Text.Json;
 
@@ -39,6 +41,11 @@ namespace ECommerceWeb.Areas.Customer.Controllers
            
             orderVM.orderItemsList = orderItemList;
             orderVM.OrderShippingAddresses = orderShippingAddresses;
+            orderVM.StatusList= _unitOfWork.OrderItemStatus.GetAll().ToList().Select(x => x.StatusName).Select(i => new SelectListItem
+            {
+                Text = i,
+                Value = i
+            });
             return View(orderVM);
         }
     }

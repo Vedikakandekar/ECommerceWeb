@@ -87,10 +87,16 @@
     <div class="container my-5">
         <header class="bg-primary text-white text-center py-3 mb-2 col-12 col-lg-10 mx-auto">
             <h4 class="display-4">Your Orders</h4>
-         
+            <div class="d-flex justify-content-end">
+                <div class="col-md-3 m-1">
+                    <select id="status-filter" asp-items="@Model.StatusList"  class="form-select">
+                        <option value="default" selected>-Filter by status-</option>
+                    </select>
+                </div>
+            </div>
         </header>
 
-
+  
 
         <template id="order-template">
             <div class="col-12 col-lg-10 p-1 mx-auto">
@@ -114,61 +120,87 @@
                 </div>
             </div>
         </template>
-
         <!-- Orders will be appended here -->
         <div id="order-list"></div>
-
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
         <script>
-           const orders = @Html.Raw(JsonConvert.SerializeObject(Model.orderItemsList, new JsonSerializerSettings{ReferenceLoopHandling = ReferenceLoopHandling.Ignore}));
-            const shippingAddresses = @Html.Raw(JsonConvert.SerializeObject(Model.OrderShippingAddresses));
-
+        
                 $(document).ready(function () {
+                const orders = @Html.Raw(JsonConvert.SerializeObject(Model.orderItemsList, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+                const shippingAddresses = @Html.Raw(JsonConvert.SerializeObject(Model.OrderShippingAddresses));
+                    let filteredOrders = [...orders];
+                    let allOrders = [...orders];
+
+                    function renderOrders() {
                     const orderTemplate = document.querySelector('#order-template').content;
                     const orderList = $('#order-list');
-
-                    orders.forEach(orderItem => {
+                    $('#order-list').empty();
+                    filteredOrders.forEach(orderItem => {
                         const clone = $(orderTemplate).clone();
-
                         clone.find('.order-image').attr('src', orderItem.Product.ImageUrl);
                         clone.find('.order-date').text(orderItem.Order.OrderDate);
                         clone.find('.order-state')
                             .addClass(getStateClass(orderItem.Status.StatusName))
                             .attr('id', `productStatus+${orderItem.OrderItemId}`)
                             .text(orderItem.Status.StatusName);
-
                         clone.find('.card-title').text(orderItem.Product.Name);
                         clone.find('.description').text(orderItem.Product.Description);
                         clone.find('.quantity').text(`Quantity: ${orderItem.Quantity}`);
                         clone.find('.total-price').text(`Total Price: $${orderItem.TotalPrice}`);
                         clone.find('.shipping-address').html(`
-                            <strong>Shipping Address:</strong><br>
-                            ${shippingAddresses[orderItem.Order.OrderId].FullName}, ${shippingAddresses[orderItem.Order.OrderId].PhoneNumber}<br>
-                            ${shippingAddresses[orderItem.Order.OrderId].Street}, ${shippingAddresses[orderItem.Order.OrderId].City}, ${shippingAddresses[orderItem.Order.OrderId].Country}
-                        `);
-
+                                        <strong>Shipping Address:</strong><br>
+                                        ${shippingAddresses[orderItem.Order.OrderId].FullName}, ${shippingAddresses[orderItem.Order.OrderId].PhoneNumber}<br>
+                                        ${shippingAddresses[orderItem.Order.OrderId].Street}, ${shippingAddresses[orderItem.Order.OrderId].City}, ${shippingAddresses[orderItem.Order.OrderId].Country}
+                                    `);
                         orderList.append(clone);
                     });
+                    }
+
+                   
+                    renderOrders();
+
+                $('#status-filter').on('change', function () {
+                    let currentStatus = $('#status-filter').val();
+                    if (currentStatus === "default") {
+
+                        filteredOrders = allOrders;
+                        renderOrders();
+                    }
+                    else{
+                        filteredOrders = [];
+                        debugger
+                        allOrders.forEach(o => {
+                            if (o.Status.StatusName==currentStatus)
+                            {
+                                debugger
+                                console.log(o.Status.StatusName);
+                                console.log(currentStatus);
+                                filteredOrders.push(o);
+                            }
+                        });
+                        console.log(filteredOrders);
+                        renderOrders();
+                    }
+                                });
+
 
                 const connection = new signalR.HubConnectionBuilder()
                     .withUrl("/orderStatusHub")
                     .build();
-
                 connection.on("ReceiveStatusUpdate", function (status, orderItemId, productName) {
                     alert(`Your Order ${productName} status has been updated to: ${status}`);
                     const statusSpan = document.getElementById(`productStatus+${orderItemId}`);
                     statusSpan.textContent = status;
                     updateStatusClass(statusSpan, status);
                 });
-
                 connection.start().catch(err => console.error(err.toString()));
 
                 function updateStatusClass(statusSpan, status) {
                     statusSpan.className = 'order-state'; // Reset classes
                     statusSpan.classList.add(getStateClass(status));
                 }
+
 
                 function getStateClass(status) {
                     switch (status) {
@@ -183,112 +215,6 @@
                 }
             });
         </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @*     @if(@Model.orderItemsList.Count>0)
-        {
-          @for (int index = 0; index < Model.orderItemsList.Count; index++)
-            {
-              
-        <div class="col-12 col-lg-10 p-1 mx-auto">
-             <div class="card order-card">
-                    <div class="row g-0">
-                    <div class="col-md-4 position-relative">
-                            <img id="product-img" src="@Model.orderItemsList[index].Product.ImageUrl" class="order-image" alt="Image">
-                            <span id="orderDate" class="order-date">@Model.orderItemsList[index].Order.OrderDate</span>
-                                <span id="productStatus+@Model.orderItemsList[index].OrderItemId"
-                                      class="order-state
-                                      @(Model.orderItemsList[index].Status.StatusName == "Pending" ? "state-pending" :
-                                        Model.orderItemsList[index].Status.StatusName == "Processed" ? "state-processed" :
-                                        Model.orderItemsList[index].Status.StatusName == "Shipped" ? "state-shipped" :
-                                        Model.orderItemsList[index].Status.StatusName == "Out for Delivery" ? "state-out-for-delivery" :
-                                        Model.orderItemsList[index].Status.StatusName == "Delivered" ? "state-delivered" :
-                                        Model.orderItemsList[index].Status.StatusName == "Cancelled" ? "state-cancelled" : "")">
-                                        @Model.orderItemsList[index].Status.StatusName
-                                </span>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                                <h5 id="product-name" class="card-title">@Model.orderItemsList[index].Product.Name</h5>
-                                <p id="product-description" class="card-text">@Model.orderItemsList[index].Product.Description</p>
-                                <p id="product-quantity" class="card-text"><strong>Quantity:</strong> @Model.orderItemsList[index].Quantity</p>
-                                <p class="card-text" id="totalPrize"><strong>Total Price:</strong> $@Model.orderItemsList[index].TotalPrice</p>
-                            <p class="card-text">
-                                <strong>Shipping Address:</strong><br>
-                                    @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].FullName, @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].PhoneNumber<br>
-                                    @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].Street,  @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].City, @Model.OrderShippingAddresses[@Model.orderItemsList[index].Order.OrderId].Country
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-            }
-        } *@
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
-   @*  <script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/orderStatusHub")
-            .build();
-            debugger
-        connection.on("ReceiveStatusUpdate", function (status,orderItemId,ProductName) {
-            alert("Your Order "+ProductName+" status has been updated to: " + status);
-            document.getElementById("productStatus+"+orderItemId).textContent = status;
-            updateStatusClass(status);
-        });
-
-        connection.start().catch(function (err) {
-            return Console.error(err.toString());
-        });
-        function updateStatusClass(status) {
-            const statusSpan = document.getElementById("productStatus+"+orderItemId);
-            statusBadge.className = 'badge status-badge';// Remove previous classes
-            switch (status) {
-                case "Pending":
-                    statusSpan.classList.add("state-pending");
-                    break;
-                case "Processed":
-                    statusSpan.classList.add("state-processed");
-                    break;
-                case "Shipped":
-                    statusSpan.classList.add("state-shipped");
-                    break;
-                case "Out for Delivery":
-                    statusSpan.classList.add("state-out-for-delivery");
-                    break;
-                case "Delivered":
-                    statusSpan.classList.add("state-delivered");
-                    break;
-                case "Cancelled":
-                    statusSpan.classList.add("state-cancelled");
-                    break;
-            }
-        }
-    </script> *@
-                           
 </body>
 </html>
