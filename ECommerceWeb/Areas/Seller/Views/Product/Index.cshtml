@@ -1,4 +1,4 @@
-﻿@model List<Products>
+﻿@model AllProductsVM
 
 <partial name="_Notifications" />
 <!DOCTYPE html>
@@ -7,13 +7,7 @@
     <title>Products</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        .Product-card {
-            transition: transform 0.3s ease-in-out;
-        }
 
-            .Product-card:hover {
-                transform: translateY(-5px);
-            }
 
         .card-icons {
             position: absolute;
@@ -28,49 +22,182 @@
                 cursor: pointer;
                 margin-left: 5px;
             }
+
+        .card-hover-effect {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .card-hover-effect:hover {
+                transform: translateY(-10px) scale(1.05);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+        .header-title {
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
     </style>
+  
     <script>
     </script>
 </head>
 <body>
-    <header class="bg-primary text-white text-center py-3 mb-4">
-        <h1 class="display-4">Your Products</h1>
-       
-    </header>
-    <div class="container">
-        <div class="row pt-4 pb-3">
-            <div class="col-6">
-                <h1> Products </h1>
-            </div>
-            <div class="col-6 text-end">
-                <a asp-controller="Product" asp-action="Upsert" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i>  Add New Product
-                </a>
+    <header class="bg-primary text-white text-center py-3 mb-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 mb-3 mb-md-0">
+                    <h1 class="header-title display-4">Your Products</h1>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a asp-controller="Product" asp-action="Upsert" class="btn btn-primary  add-product-btn card-hover-effect" style="color:black;font-weight:500; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+                        <i class="bi bi-plus-circle me-1 display"></i> Add New Product
+                    </a>
+                </div>
             </div>
         </div>
-        <main class="container my-5">
-            <div class="row g-4">
-                @foreach (var o in Model)
-                {
-                    <div class="col-md-4 col-sm-6">
-                        <div class="card Product-card h-100">
-                            <div class="card-icons ">
-                                <a asp-controller="Product" asp-action="Upsert" asp-route-id="@o.Id"> <i class="bi bi-pencil-fill text-primary"></i> </a>
-                                <a asp-controller="Product" asp-action="Delete" asp-route-id="@o.Id"> <i class="bi bi-trash3-fill text-danger"></i> </a>
-                            </div>
-                            <img src="@o.ImageUrl?height=200&width=300" width="100%" class="card-img-top" style="border-radius:5px; border:1px solid #bbb9b9" alt="Img" />
-                            <div class="card-body">
-                                <h5 class="card-title">@o.Name</h5>
-                                <h6 class="card-subtitle">@o.Category.Name</h6>
-                                <h4 class="card-subtitle mb-2 text-body-secondary">Cost : @o.Price</h4>
-                                <h4 class="card-subtitle mb-2 text-body-secondary">In stock : @o.stock</h4>
-                                <p class="card-text">@o.Description</p>
-                            </div>
-                        </div>
-                    </div>
-                }
+    </header>
+    <div class="container mt-2">
+        <div class="row mb-2">
+            <div class="col-md-6 ">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search products">
             </div>
-        </main>
+
+            <div class="col-md-3 ">
+                <select id="category-filter" asp-items="@Model.CategoryList" class="form-select">
+                    <option selected>-Select Category-</option>
+                </select>
+            </div>
+            <div class="col-md-2 ">
+                <select id="price-filter" class="form-select">
+                    <option>-Sort by Price-</option>
+                    <option value="low-to-high">Low to High</option>
+                    <option value="high-to-low">High to Low</option>
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <button type="button" id="applyBtn" class="btn btn-primary btn-sm form-control">Apply</button>
+                <button type="button" id="resetBtn" class="btn btn-primary btn-sm form-control" style="display:none;"><i class="bi bi-arrow-counterclockwise"></i>Clear</button>
+            </div>
+        </div>
     </div>
+    <script type="text/template" id="product-template">
+        <div class="col-lg-3 col-sm-6 p-3">
+        <div class="card border-0 p-3 shadow border-top border-5 rounded card-hover-effect">
+                <div class="card-icons ">
+                    <a id="edit-product"> <i class="bi bi-pencil-fill text-primary"></i> </a>
+                    <a id="delete-product"> <i class="bi bi-trash3-fill text-danger"></i> </a>
+                </div>
+            <div style="height: 200px; display: flex; justify-content: center; align-items: center; overflow: hidden;" class="align-middle">
+                <img id="product-img" src="" class="card-img-top" alt="Img" />
+            </div>
+            <div class="card-body pb-0">
+                <div class="pl-1">
+                    <p id="product-name" class="card-title h5 text-dark opacity-75 text-uppercase text-center"></p>
+                </div>
+                    <span id="product-category" class="card-subtitle"></span>
+                <div class="pl-1">
+                    <p class="text-dark text-opacity-75  mb-0">
+                        Price: <span id="product-price" class="text-dark text-opacity-75"></span>
+                    </p>
+                    <p class="text-dark text-opacity-75 mb-0">
+                        Stock: <span id="product-stock" class="text-dark text-opacity-75 "></span>
+                    </p>
+                </div>
+                </div>
+            </div>
+        </div>
+
+
+    </script>
+
+    <div id="product-container" class="row pb-4"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const ProductList = @Html.Raw(Json.Serialize(Model.ProductList));
+        let filteredProducts = [...ProductList];
+        let allProducts = [...ProductList];
+        debugger
+        debugger
+        $(document).ready(function () {
+            renderProducts()
+            $('#applyBtn').on('click', function () {
+                let searchTerm = $('#searchInput').val();
+                let category = $('#category-filter').val();
+                let price = $('#price-filter').val();
+
+                if (searchTerm.trim() != '' || category != "-Select Category-" || price != "-Sort by Price-") {
+                    $(this).hide();
+                    $('#resetBtn').show();
+                    $('#price-filter').prop('disabled', true);
+                    $('#category-filter').prop('disabled', true);
+                    $('#searchInput').prop('disabled', true);
+                    if (category === "-Select Category-") {
+                        category = "";
+                    }
+                    if (price === "-Sort by Price-") {
+                        price = "";
+                    }
+                    debugger
+                    $.ajax({
+                        url: '/Seller/Product/SearchSellerProduct',
+                        type: 'GET',
+                        data: {
+                            searchString: searchTerm,
+                            categoryFilter: category,
+                            priceFilter: price
+                        },
+                        datatype: 'json',
+                        success: function (data) {
+                            if (data.success) {
+
+                                console.log(data);
+
+                                filteredProducts = data.products;
+                                renderProducts();
+                            }
+                        },
+                        error: function (jqXHR, textStatus, err) {
+                            console.log("AJX Error : ", textStatus, err)
+                        }
+
+                    });
+                    debugger
+                }
+            });
+
+            $('#resetBtn').click(function () {
+                $(this).hide();
+                $('#searchInput').val('');
+                $('#applyBtn').show();
+                $('#price-filter').prop('disabled', false);
+                $('#category-filter').prop('disabled', false);
+                $('#searchInput').prop('disabled', false);
+                $('#price-filter').prop('selectedIndex', 0);
+                $('#category-filter').prop('selectedIndex', 0);
+                filteredProducts = allProducts;
+                renderProducts();
+            });
+        });
+        function renderProducts() {
+            $('#product-container').empty();
+            const template = $('#product-template').html();
+            filteredProducts.forEach(product => {
+                let productHtml = $(template);
+                productHtml.find('#edit-product').attr('href', `/seller/product/Upsert?id=${product.id}`);
+                productHtml.find('#delete-product').attr('href', `/seller/product/delete?id=${product.id}`);
+                productHtml.find('#product-img').attr('src', `${product.imageUrl}`);
+                productHtml.find('#product-name').text(product.name);
+                productHtml.find('#product-category').text(product.category.name);
+                productHtml.find('#product-price').text(product.price);
+                productHtml.find('#product-stock').text(product.stock);
+                $('#product-container').append(productHtml);
+            });
+        }
+      
+    </script>
+
 </body>
 </html>

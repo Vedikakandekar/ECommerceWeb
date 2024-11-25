@@ -25,8 +25,14 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         }
         public IActionResult Index()
         {
-            List<Products> products = _unitOfWork.Product.GetAll(u => u.SellerId == _userManager.GetUserId(User), includeProperties: "Category,").ToList();
-            return View(products);
+            AllProductsVM productsVM = new AllProductsVM();
+            productsVM.ProductList= _unitOfWork.Product.GetAll(u => u.SellerId == _userManager.GetUserId(User), includeProperties: "Category,").ToList();
+            productsVM.CategoryList = _unitOfWork.Category.GetAll().ToList().Select(x => x.Name).Select(i => new SelectListItem
+            {
+                Text = i,
+                Value = i
+            });
+            return View(productsVM);
         }
         public IActionResult Upsert(int? id)
         {
@@ -137,6 +143,23 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             TempData["success"] = "Product Deleted Successfully";
             return RedirectToAction("Index", "Product"); //parameters = action name, controller name
         }
+
+        public IActionResult SearchSellerProduct(string searchString, string categoryFilter, string priceFilter)
+        {
+            string currentLoggedInSeller = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(currentLoggedInSeller))
+                {
+                return Json(new EmptyResult());
+            }
+            if (string.IsNullOrWhiteSpace(searchString) && string.IsNullOrEmpty(categoryFilter) && string.IsNullOrEmpty(priceFilter))
+            {
+                return Json(new EmptyResult());
+            }
+            List<Products> ProductList = _unitOfWork.Product.GetAll(u=>u.SellerId==currentLoggedInSeller, includeProperties: "Category").ToList();
+            List<Products> FilteredProducts = ControllerHelper.FilterProductList(ProductList, searchString, categoryFilter, priceFilter);
+            return Json(new { success = true, products = FilteredProducts });
+        }
+
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()

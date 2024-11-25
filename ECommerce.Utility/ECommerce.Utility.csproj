@@ -12,4 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.0" />
   </ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\ECommerce.Models\ECommerce.Models.csproj" />
+	</ItemGroup>
 </Project>

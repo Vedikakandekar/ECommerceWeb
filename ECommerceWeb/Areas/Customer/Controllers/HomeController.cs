@@ -133,28 +133,8 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             {
                 return Json(new EmptyResult());
             }
-            List<Products> FilteredProducts;
             List<Products> ProductList = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category").ToList();
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                 FilteredProducts = ProductList.Where(product => product.Name != null && product.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-            else
-            {
-                FilteredProducts = ProductList;
-            }
-            if (!string.IsNullOrEmpty(categoryFilter))
-            {
-                FilteredProducts = FilteredProducts.Where(u => u.Category.Name.Contains(categoryFilter)).ToList();
-            }
-            if (priceFilter == "low-to-high")
-            {
-                FilteredProducts = FilteredProducts.OrderBy(u => u.Price).ToList();
-            }
-            if (priceFilter == "high-to-low")
-            {
-                FilteredProducts = FilteredProducts.OrderByDescending(u => u.Price).ToList();
-            }
+            List<Products> FilteredProducts = ControllerHelper.FilterProductList(ProductList, searchString, categoryFilter,priceFilter);
             return Json(new { success = true, products = FilteredProducts });
         }
 
