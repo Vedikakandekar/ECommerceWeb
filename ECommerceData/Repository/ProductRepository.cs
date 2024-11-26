@@ -25,6 +25,7 @@ namespace ECommerce.Data.Repository
                 objFromDb.Description = newProduct.Description;
                 objFromDb.CategoryId = newProduct.CategoryId;
                 objFromDb.SellerId = newProduct.SellerId;
+                objFromDb.stock = newProduct.stock;
                 if (newProduct.ImageUrl != null)
                 {
                     objFromDb.ImageUrl = newProduct.ImageUrl;

@@ -6,39 +6,7 @@
 <head>
     <title>Products</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-
-
-        .card-icons {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 5px;
-            padding: 5px;
-        }
-
-            .card-icons i {
-                cursor: pointer;
-                margin-left: 5px;
-            }
-
-        .card-hover-effect {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-            .card-hover-effect:hover {
-                transform: translateY(-10px) scale(1.05);
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            }
-
-        .header-title {
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-
-    </style>
+    <link rel="stylesheet" href="~/css/Seller/ProductIndexStyleSheet.css">
   
     <script>
     </script>
@@ -116,88 +84,9 @@
     <div id="product-container" class="row pb-4"></div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        const ProductList = @Html.Raw(Json.Serialize(Model.ProductList));
-        let filteredProducts = [...ProductList];
-        let allProducts = [...ProductList];
-        debugger
-        debugger
-        $(document).ready(function () {
-            renderProducts()
-            $('#applyBtn').on('click', function () {
-                let searchTerm = $('#searchInput').val();
-                let category = $('#category-filter').val();
-                let price = $('#price-filter').val();
-
-                if (searchTerm.trim() != '' || category != "-Select Category-" || price != "-Sort by Price-") {
-                    $(this).hide();
-                    $('#resetBtn').show();
-                    $('#price-filter').prop('disabled', true);
-                    $('#category-filter').prop('disabled', true);
-                    $('#searchInput').prop('disabled', true);
-                    if (category === "-Select Category-") {
-                        category = "";
-                    }
-                    if (price === "-Sort by Price-") {
-                        price = "";
-                    }
-                    debugger
-                    $.ajax({
-                        url: '/Seller/Product/SearchSellerProduct',
-                        type: 'GET',
-                        data: {
-                            searchString: searchTerm,
-                            categoryFilter: category,
-                            priceFilter: price
-                        },
-                        datatype: 'json',
-                        success: function (data) {
-                            if (data.success) {
-
-                                console.log(data);
-
-                                filteredProducts = data.products;
-                                renderProducts();
-                            }
-                        },
-                        error: function (jqXHR, textStatus, err) {
-                            console.log("AJX Error : ", textStatus, err)
-                        }
-
-                    });
-                    debugger
-                }
-            });
-
-            $('#resetBtn').click(function () {
-                $(this).hide();
-                $('#searchInput').val('');
-                $('#applyBtn').show();
-                $('#price-filter').prop('disabled', false);
-                $('#category-filter').prop('disabled', false);
-                $('#searchInput').prop('disabled', false);
-                $('#price-filter').prop('selectedIndex', 0);
-                $('#category-filter').prop('selectedIndex', 0);
-                filteredProducts = allProducts;
-                renderProducts();
-            });
-        });
-        function renderProducts() {
-            $('#product-container').empty();
-            const template = $('#product-template').html();
-            filteredProducts.forEach(product => {
-                let productHtml = $(template);
-                productHtml.find('#edit-product').attr('href', `/seller/product/Upsert?id=${product.id}`);
-                productHtml.find('#delete-product').attr('href', `/seller/product/delete?id=${product.id}`);
-                productHtml.find('#product-img').attr('src', `${product.imageUrl}`);
-                productHtml.find('#product-name').text(product.name);
-                productHtml.find('#product-category').text(product.category.name);
-                productHtml.find('#product-price').text(product.price);
-                productHtml.find('#product-stock').text(product.stock);
-                $('#product-container').append(productHtml);
-            });
-        }
-      
+    const ProductList = @Html.Raw(Json.Serialize(Model.ProductList));
     </script>
+    <script src="~/js/Seller/ProductIndexScript.js"></script>
 
 </body>
 </html>

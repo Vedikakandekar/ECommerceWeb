@@ -1,93 +1,13 @@
-﻿@model CartVM
+﻿@using Newtonsoft.Json
+@model CartVM
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-commerce Cart with Cards</title>
+    <title>E-commerce Cart </title>
 
-    <style>
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease-in-out;
-        }
-
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            }
-
-        .product-item {
-            border-bottom: 1px solid #e9ecef;
-            padding: 20px 0;
-            transition: background-color 0.3s ease;
-        }
-
-            .product-item:last-child {
-                border-bottom: none;
-            }
-
-            .product-item:hover {
-                background-color: #f8f9fa;
-            }
-
-        .btn-quantity {
-            min-width: 38px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-primary {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-            .btn-primary:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-            }
-
-        .delete-icon {
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-            .delete-icon:hover {
-                color: #dc3545;
-            }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .shipping-card {
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .address-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-            .address-card:hover {
-                background-color: #f8f9fa;
-            }
-
-            .address-card.selected {
-                border: 2px solid #007bff;
-            }
-    </style>
+    <link rel="stylesheet" href="~/css/Customer/CartStyleSheet.css">
 </head>
 <body>
     <header class="bg-primary text-white text-center py-3">
@@ -105,13 +25,8 @@
                             <input asp-for="@Model.cart.CustomerId" hidden />
                             <input asp-for="@Model.cart.CartId" hidden />
                             <input asp-for="@Model.shippingAddress.CustomerId" hidden />
-
-
-
                             <div class="row">
-
                                 <div class="col-12">
-
                                     @for (int index = 0; index < Model.cart.CartItems.Count; index++)
                                     {
                                         var item = @Model.cart.CartItems[index];
@@ -121,7 +36,10 @@
                                                     <div>
                                                         <h6 class="my-0">@item.Product.Name</h6>
                                                         <input asp-for="cart.CartItems[index].Product.Name" hidden />
-                                                        <small class="text-muted" asp-for="cart.CartItems[index].Product">@item.Product.Description</small>
+                                                        @if(Model.cart.CartItems[index].Product.stock<1)
+                                                    {
+                                                        <span class="text-danger me-2" id="product-out-of-stock" >Currently Out of stock</span>
+                                                    }
                                                         <input asp-for="cart.CartItems[index].Product.Description" hidden />
                                                         <input asp-for="cart.CartItems[index].Product.Id" type="hidden" />
                                                         <input asp-for="cart.CartItems[index].ProductId" type="hidden" />
@@ -134,30 +52,26 @@
                                                         <input asp-for="cart.CartItems[index].CartItemId" type="hidden" />
                                                         <input asp-for="cart.CartItems[index].CartId" type="hidden" />
                                                         <input asp-for="cart.CartItems[index].CartItemId" type="hidden" />
-
                                                     </div>
                                                     <div class="d-flex align-items-center">
-
-                                                        <span asp-for="@Model.cart.CartItems[index].Price" class="text-muted me-2">$<span class="product-price" data-price="@item.Product.Price">@item.Product.Price</span></span>
+                                                        <span class="text-muted me-2">$<span  asp-for="cart.CartItems[index].Product.Price" id="product-price-@Model.cart.CartItems[index].ProductId" class="product-price" data-price="@item.Product.Price">@item.Product.Price</span></span>
                                                         <div class="btn-group btn-group-sm me-2" role="group" aria-label="Quantity controls for Product 1">
-                                                            <button type="button" class="btn btn-outline-secondary decrement">-</button>
-                                                            <button type="button" class="btn btn-outline-secondary quantity" disabled asp-for="cart.CartItems.ElementAt(index).Quantity">@item.Quantity</button>
-                                                            <input asp-for="@Model.cart.CartItems[index].Quantity" type="hidden" class="quantity-input" />
-                                                            <button type="button" id="increaseId" class="btn btn-outline-secondary increment">+</button>
+                                                            <button type="button" id="product-quantity-decrement-@Model.cart.CartItems[index].ProductId" class="btn btn-outline-secondary decrement">-</button>
+                                                            <button type="button" value="@Model.cart.CartItems[index].Quantity" id="product-quantity-@Model.cart.CartItems[index].ProductId"  class="btn btn-outline-secondary quantity" disabled>@Model.cart.CartItems[index].Quantity</button>
+                                                            <input asp-for="@Model.cart.CartItems[index].Quantity" id="quantityInput-@Model.cart.CartItems[index].ProductId" type="hidden" class="quantity-input" />
+                                                            <button type="button" id="product-quantity-increment-@Model.cart.CartItems[index].ProductId" class="btn btn-outline-secondary increment">+</button>
                                                         </div>
                                                         <a asp-controller="Cart" asp-action="Delete" asp-route-productId="@Model.cart.CartItems[index].Product.Id" class="text-danger" aria-label="Delete Product">
                                                             <i class="bi bi-trash delete-icon"></i>
                                                         </a>
                                                     </div>
-
-                                                    <div class="product-total" data-price="@item.Product.Price">Total: $<span class="total-price"> @item.Product.Price</span></div>
+                                                    <div class="product-total" id="product-totalprice-@Model.cart.CartItems[index].ProductId"  data-price="@item.Product.Price">Total: $<span class="total-price"> @item.Product.Price</span></div>
                                                 </div>
                                             </div>
                                         </div>
                                     }
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -201,41 +115,37 @@
         <input id="State" asp-for="@Model.shippingAddress.State" type="hidden" />
         <input id="Country"  asp-for="@Model.shippingAddress.Country" type="hidden" />
         <input id="ZipCode" asp-for="@Model.shippingAddress.ZipCode" type="hidden" />
-
-
         <div class="card mb-4 mt-2">
             <div class="card-body">
                 <h5 class="card-title mb-4">Select Shipping Address</h5>
                 <div id="addressList">
-                    @for (int index = 0; index < Model.addressList.Count; index++)
+                 @for (int index = 0; index < Model.addressList.Count; index++)
                     {
+                
+                   
                         <input id="AddressId" asp-for="@Model.addressList[index].AddressId" type="hidden" />
-                        <div class="card address-card mb-3" data-address-id="@Model.addressList[index].AddressId">
+                        <div class="card address-card mb-3" id="addressCard-@Model.addressList[index].AddressId" data-address-id="@Model.addressList[index].AddressId">
                             <div class="card-body">
                                 <a asp-controller="Cart" asp-action="DeleteAddress" asp-route-addressId="@Model.addressList[index].AddressId"  class="position-absolute top-0 end-0 m-2" aria-label="Delete">
                                     <i class="bi bi-trash delete-icon"></i>
                                 </a>
-                                <h6 class="card-title">@Model.addressList[index].FullName</h6>
-                                <h6 class="card-title">@Model.addressList[index].PhoneNumber</h6>
-                                <p class="card-text">@Model.addressList[index].Street , @Model.addressList[index].City , @Model.addressList[index].State , @Model.addressList[index].Country, @Model.addressList[index].ZipCode </p>
+                                <h6 id="addr-fullname-@Model.addressList[index].AddressId" class="card-title">@Model.addressList[index].FullName</h6>
+                                <h6 id="addr-phone-@Model.addressList[index].AddressId" class="card-title">@Model.addressList[index].PhoneNumber</h6>
+                                <p  class="card-text"> <spanid="addr-street-@Model.addressList[index].AddressId">@Model.addressList[index].Street</spanid> , <span id="addr-city-@Model.addressList[index].AddressId"> @Model.addressList[index].City</span> , <span id="addr-state-@Model.addressList[index].AddressId">@Model.addressList[index].State</span> ,<span id="addr-country-@Model.addressList[index].AddressId">@Model.addressList[index].Country</span>,<span id="addr-zipcode-@Model.addressList[index].AddressId"> @Model.addressList[index].ZipCode</span> </p>
 
                             </div>
                         </div>
-                    }
-                </div>
+                   
+                
+                 }
+                 </div>
                 <button id="addNewAddressBtn" type="button" class="btn btn-outline-primary mt-3">
                     <i class="bi bi-plus-circle me-2"></i>Add New Address
                 </button>
             </div>
         </div>
-
-        <button id="proceedToPaymentBtn" type="submit" class="btn btn-primary btn-lg w-100 mt-4">Proceed to Payment</button>
-
-
-
-               
+        <button id="proceedToPaymentBtn" type="submit" class="btn btn-primary btn-lg w-100 mt-4">Proceed to Payment</button>            
     </form>
-
     <div id="shippingOverlay" class="overlay">
         <div class="card shipping-card">
             <div class="card-body">
@@ -283,173 +193,11 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const updateCart = () => {
-
-                let subtotal = 0;
-                document.querySelectorAll(".product-card").forEach((card) => {
-                    const quantityElement = card.querySelector(".quantity");
-                    const quantity = parseInt(quantityElement.textContent);
-                    const price = parseFloat(card.querySelector(".product-price").dataset.price);
-                    const quantityInput = card.querySelector(".quantity-input");
-                    const itemSubtotal = quantity * price;
-                    subtotal += itemSubtotal;
-                    const totalPriceElement = card.querySelector(".total-price");
-                    totalPriceElement.textContent = itemSubtotal.toFixed(2);
-                    quantityInput.value = quantity;
-                });
-                const shippingFees = parseFloat(document.getElementById("shipping-fees").textContent.replace("$", ""));
-                document.getElementById("subtotal").textContent = "$" + subtotal.toFixed(2);
-                document.getElementById("total").textContent = "$" + (subtotal + shippingFees).toFixed(2);
-            };
-
-            document.querySelectorAll(".increment").forEach((button) => {
-                button.addEventListener("click", function () {
-                    const card = button.closest(".product-card")
-                    const quantityElement = button.parentNode.querySelector(".quantity");
-                    let quantity = parseInt(quantityElement.textContent);
-                    quantity += 1;
-                    quantityElement.textContent = quantity;
-                    updateCart();
-                });
-            });
-
-            document.querySelectorAll(".decrement").forEach((button) => {
-                button.addEventListener("click", function () {
-                    const card = button.closest(".product-card")
-                    const quantityElement = button.parentNode.querySelector(".quantity");
-                    let quantity = parseInt(quantityElement.textContent);
-                    if (quantity > 1) {
-                        quantity -= 1;
-                        quantityElement.textContent = quantity;
-                        updateCart();
-                    }
-                });
-            });
-        });
+         const cartItemList = @Html.Raw(JsonConvert.SerializeObject(Model.cart.CartItems, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+              const addressList = @Html.Raw(JsonConvert.SerializeObject(Model.addressList, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const addNewAddressBtn = document.getElementById('addNewAddressBtn');
-            const shippingOverlay = document.getElementById('shippingOverlay');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const OrderForm = document.getElementById('OrderForm');
-            const AddressForm = document.getElementById('AddressForm');
-            const addressList = document.getElementById('addressList');
-            const proceedToPaymentBtn = document.getElementById('proceedToPaymentBtn');
-
-            function selectAddress(id) {
-
-                const addresses = addressList.querySelectorAll('.address-card');
-                addresses.forEach(addr => {
-                  
-                    if (addr.dataset.addressId === id.toString()) {
-                        addr.classList.add('selected');
-                  
-                        document.getElementById('AddressId').value = id;
-                        document.getElementById('FullName').value = addr.querySelector('.card-title').textContent;
-                        document.getElementById('PhoneNumber').value = addr.querySelectorAll('.card-title')[1].textContent;
-                        document.getElementById('Street').value = addr.querySelector('.card-text').textContent.split(", ")[0];
-                        document.getElementById('City').value = addr.querySelector('.card-text').textContent.split(", ")[1];
-                        document.getElementById('State').value = addr.querySelector('.card-text').textContent.split(", ")[2];
-                        document.getElementById('Country').value = addr.querySelector('.card-text').textContent.split(", ")[3];
-                        document.getElementById('ZipCode').value = addr.querySelector('.card-text').textContent.split(", ")[4];
-                 
-                    } else {
-                        addr.classList.remove('selected');
-                    }
-                });
-            }
-
-            function getSelectedAddress() {
-                const selectedAddress = addressList.querySelector('.address-card.selected');
-                if (selectedAddress) {
-
-                    return {
-                        id: selectedAddress.dataset.addressId,
-                        name: selectedAddress.querySelector('.card-title').textContent,
-                        address: selectedAddress.querySelector('.card-text').textContent
-                    };
-                }
-                return null;
-            }
-
-            addressList.addEventListener('click', function (e) {
-                const addressCard = e.target.closest('.address-card');
-                if (addressCard) {
-                   
-                    selectAddress(addressCard.dataset.addressId);
-                   
-                }
-            });
-
-            addNewAddressBtn.addEventListener('click', function () {
-
-                shippingOverlay.style.display = 'flex';
-            });
-
-            cancelBtn.addEventListener('click', function () {
-                shippingOverlay.style.display = 'none';
-            });
-
-            AddressForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const addressData = {
-                    FullName: document.getElementById('fullName').value,
-                    Street: document.getElementById('address').value,
-                    City: document.getElementById('city').value,
-                    State: document.getElementById('state').value,
-                    Country: document.getElementById('country').value,
-                    ZipCode: document.getElementById('zipCode').value,
-                    PhoneNumber: document.getElementById('phonenumber').value,
-                    AddressId: document.getElementById('AddressId').value,
-                    CustomerId: document.getElementById('CustomerId').value
-                };
-
-                // Send AJAX request to addAddress action
-                fetch('/Customer/Cart/AddAddress', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest' // Indicates it's an AJAX request
-                    },
-                    body: JSON.stringify(addressData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-
-                          
-                            location.reload();
-                            shippingOverlay.style.display = 'none';
-                            AddressForm.reset();
-                        } else {
-                            alert('Error: Could not add address');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('There was an error adding the address.');
-                    });
-                shippingOverlay.style.display = 'none';
-                AddressForm.reset();
-            });
-
-            OrderForm.addEventListener('submit', function (e) {
-
-                const selectedAddress = getSelectedAddress();
-                if (selectedAddress) {
-                    alert(`Proceeding to payment with address:\nName: ${selectedAddress.name}\nAddress: ${selectedAddress.address}`);
-                    console.log('Selected address:', selectedAddress);
-                    // Here you would typically send the selected address to your server or payment processor
-                    OrderForm.submit();
-                } else {
-                    alert('Please select a shipping address');
-                }
-            });
-        });
-    </script>
+     <script src="~/js/Customer/CartIndexScript.js"></script>
 </body>
 </html>

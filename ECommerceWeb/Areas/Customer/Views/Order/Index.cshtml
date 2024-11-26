@@ -7,81 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History</title>
-
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .order-card {
-            transition: all 0.3s ease;
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-            .order-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-            }
-
-        .order-image {
-            object-fit: cover;
-            height: 200px;
-            width: 300px;
-        }
-
-        .order-date {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-
-        .order-state {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .state-pending {
-            background-color: #ffc107; 
-            color: black;
-        }
-
-        .state-processed {
-            background-color: #17a2b8; 
-            color: white;
-        }
-
-        .state-shipped {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .state-out-for-delivery {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .state-delivered {
-            background-color: #28a745; 
-            color: white;
-        }
-
-        .state-cancelled {
-            background-color: #dc3545; 
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/Customer/OrderIndexStyleSheet.css">
+  
 </head>
 <body>
     <div class="container my-5">
@@ -120,101 +47,16 @@
                 </div>
             </div>
         </template>
-        <!-- Orders will be appended here -->
+   
         <div id="order-list"></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-        
-                $(document).ready(function () {
-                const orders = @Html.Raw(JsonConvert.SerializeObject(Model.orderItemsList, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
-                const shippingAddresses = @Html.Raw(JsonConvert.SerializeObject(Model.OrderShippingAddresses));
-                    let filteredOrders = [...orders];
-                    let allOrders = [...orders];
-
-                    function renderOrders() {
-                    const orderTemplate = document.querySelector('#order-template').content;
-                    const orderList = $('#order-list');
-                    $('#order-list').empty();
-                    filteredOrders.forEach(orderItem => {
-                        const clone = $(orderTemplate).clone();
-                        clone.find('.order-image').attr('src', orderItem.Product.ImageUrl);
-                        clone.find('.order-date').text(orderItem.Order.OrderDate);
-                        clone.find('.order-state')
-                            .addClass(getStateClass(orderItem.Status.StatusName))
-                            .attr('id', `productStatus+${orderItem.OrderItemId}`)
-                            .text(orderItem.Status.StatusName);
-                        clone.find('.card-title').text(orderItem.Product.Name);
-                        clone.find('.description').text(orderItem.Product.Description);
-                        clone.find('.quantity').text(`Quantity: ${orderItem.Quantity}`);
-                        clone.find('.total-price').text(`Total Price: $${orderItem.TotalPrice}`);
-                        clone.find('.shipping-address').html(`
-                                        <strong>Shipping Address:</strong><br>
-                                        ${shippingAddresses[orderItem.Order.OrderId].FullName}, ${shippingAddresses[orderItem.Order.OrderId].PhoneNumber}<br>
-                                        ${shippingAddresses[orderItem.Order.OrderId].Street}, ${shippingAddresses[orderItem.Order.OrderId].City}, ${shippingAddresses[orderItem.Order.OrderId].Country}
-                                    `);
-                        orderList.append(clone);
-                    });
-                    }
-
-                   
-                    renderOrders();
-
-                $('#status-filter').on('change', function () {
-                    let currentStatus = $('#status-filter').val();
-                    if (currentStatus === "default") {
-
-                        filteredOrders = allOrders;
-                        renderOrders();
-                    }
-                    else{
-                        filteredOrders = [];
-                        debugger
-                        allOrders.forEach(o => {
-                            if (o.Status.StatusName==currentStatus)
-                            {
-                                debugger
-                                console.log(o.Status.StatusName);
-                                console.log(currentStatus);
-                                filteredOrders.push(o);
-                            }
-                        });
-                        console.log(filteredOrders);
-                        renderOrders();
-                    }
-                                });
-
-
-                const connection = new signalR.HubConnectionBuilder()
-                    .withUrl("/orderStatusHub")
-                    .build();
-                connection.on("ReceiveStatusUpdate", function (status, orderItemId, productName) {
-                    alert(`Your Order ${productName} status has been updated to: ${status}`);
-                    const statusSpan = document.getElementById(`productStatus+${orderItemId}`);
-                    statusSpan.textContent = status;
-                    updateStatusClass(statusSpan, status);
-                });
-                connection.start().catch(err => console.error(err.toString()));
-
-                function updateStatusClass(statusSpan, status) {
-                    statusSpan.className = 'order-state'; // Reset classes
-                    statusSpan.classList.add(getStateClass(status));
-                }
-
-
-                function getStateClass(status) {
-                    switch (status) {
-                        case "Pending": return "state-pending";
-                        case "Processed": return "state-processed";
-                        case "Shipped": return "state-shipped";
-                        case "Out for Delivery": return "state-out-for-delivery";
-                        case "Delivered": return "state-delivered";
-                        case "Cancelled": return "state-cancelled";
-                        default: return "";
-                    }
-                }
-            });
+                    const orders = @Html.Raw(JsonConvert.SerializeObject(Model.orderItemsList, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+            const shippingAddresses = @Html.Raw(JsonConvert.SerializeObject(Model.OrderShippingAddresses));
         </script>
+       
+        <script src="~/js/Customer/OrderIndexScript.js"></script>
     </div>
 </body>
 </html>

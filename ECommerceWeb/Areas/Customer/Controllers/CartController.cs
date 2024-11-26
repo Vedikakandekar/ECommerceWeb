@@ -82,8 +82,14 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                     orderItem.StatusId = _unitOfWork.OrderItemStatus.Get(u => u.StatusName == "Pending").StatusId;
                     _unitOfWork.OrderItem.Add(orderItem);
                     _unitOfWork.Save();
-                }
+                    Products productToUpdate = _unitOfWork.Product.Get(u => u.Id == listItem.ProductId);
+                    productToUpdate.stock = productToUpdate.stock - listItem.Quantity;
+                    _unitOfWork.Product.Update(productToUpdate);
+                    _unitOfWork.Save();
 
+                }
+                
+               
                 Cart cartToRemove = _unitOfWork.Cart.Get(u => u.CartId == cartVM.cart.CartId);
 
                 _unitOfWork.CartItem.RemoveRane(_unitOfWork.CartItem.GetAll(u=>u.CartId==cartVM.cart.CartId));

@@ -1,0 +1,21 @@
+﻿.category-card {
+    transition: transform 0.3s ease-in-out;
+}
+
+    .category-card:hover {
+        transform: translateY(-5px);
+    }
+
+.card-icons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+    .card-icons i {
+        cursor: pointer;
+        margin-left: 5px;
+    }

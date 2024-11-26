@@ -6,39 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Order Management</title>
-
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .order-card {
-            transition: all 0.3s ease;
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-            .order-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-            }
-
-        .status-badge {
-            font-size: 0.8rem;
-            padding: 0.3rem 0.5rem;
-        }
-
-        .product-details {
-            font-size: 0.9rem;
-        }
-
-        .indigo-700 {
-            background-color: #3f51b5; 
-            color: white; 
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/Seller/OrderIndexStyleSheet.css">
+ 
 </head>
 <body>
     <header class="bg-primary text-white text-center py-3 mb-4">
@@ -116,60 +85,8 @@
     </div>
 
 
-    <script>
-        function updateOrderStatus(button, orderItemId) {
-            const select = button.previousElementSibling;
-            const newStatus = select.value;
-
-            if (newStatus === 'Update status') {
-                alert('Please select a valid status.');
-                return;
-            }
-
-            const url = `/seller/order/updatestatus?orderItemId=${encodeURIComponent(orderItemId)}&status=${encodeURIComponent(newStatus)}`;
-
-            fetch(url, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error('Failed to update status');
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        const statusBadge = button.parentElement.querySelector('.status-badge');
-                        statusBadge.textContent = newStatus;
-
-                        statusBadge.className = 'badge status-badge';
-                        switch (newStatus) {
-                            case 'Pending':
-                                statusBadge.classList.add('bg-warning');
-                                break;
-                            case 'Processed':
-                                statusBadge.classList.add('bg-info');
-                                break;
-                            case 'Shipped':
-                                statusBadge.classList.add('bg-primary');
-                                break;
-                            case 'Out for Delivery':
-                            case 'Delivered':
-                                statusBadge.classList.add('bg-success');
-                                break;
-                            case 'Cancelled':
-                                statusBadge.classList.add('bg-danger');
-                                break;
-                        }
-                        alert('Status updated successfully!');
-                    } else {
-                        alert('Failed to update status.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating status.');
-                });
-        }
+    <script src="~/js/Seller/OrderIndexScript.js">
+      
     </script>
 </body>
 </html>
