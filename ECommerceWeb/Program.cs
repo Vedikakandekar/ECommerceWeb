@@ -63,7 +63,7 @@ app.MapRazorPages();
 app.UseCors("AllowAll");
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapHub<OrderStatusChangedHub>("/orderStatusHub");
+    endpoints.MapHub<SignalRHub>("/orderStatusHub");
 });
 app.MapControllerRoute(
     name: "default",

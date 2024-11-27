@@ -8,6 +8,7 @@ using System.Text.Json;
 using Microsoft.CodeAnalysis;
 using ECommerce.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ECommerceWeb.Areas.Customer.Controllers
 {
@@ -18,11 +19,14 @@ namespace ECommerceWeb.Areas.Customer.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<IdentityUser> _userManager;
-        public CartController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager)
+        private readonly IHubContext<SignalRHub> _hubContext;
+
+        public CartController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager, IHubContext<SignalRHub> hubContext)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _hubContext = hubContext;
         }
         public IActionResult Index()
         {
@@ -49,7 +53,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
 
 
         [HttpPost, ActionName("Index")]
-        public IActionResult IndexPost(CartVM cartVM)
+        public async Task<IActionResult> IndexPost(CartVM cartVM)
             {
             string currentLogedInUser = _userManager.GetUserId(User);
             if (currentLogedInUser == null || cartVM.cart.CartItems.Count==0)
@@ -86,7 +90,8 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                     productToUpdate.stock = productToUpdate.stock - listItem.Quantity;
                     _unitOfWork.Product.Update(productToUpdate);
                     _unitOfWork.Save();
-
+                    string message = $"Received Order for {orderItem.ProductId} - {listItem.Product.Name} ";
+                    await _hubContext.Clients.User(listItem.Product.SellerId).SendAsync("ReceiveNotification", message);
                 }
                 
                

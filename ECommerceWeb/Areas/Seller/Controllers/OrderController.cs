@@ -17,9 +17,9 @@ namespace ECommerceWeb.Areas.Seller.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IHubContext<OrderStatusChangedHub> _hubContext;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public OrderController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager, IHubContext<OrderStatusChangedHub> hubContext)
+        public OrderController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager, IHubContext<SignalRHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
@@ -78,10 +78,10 @@ namespace ECommerceWeb.Areas.Seller.Controllers
             orderItem.StatusId = OrderStatus.StatusId;
             _unitOfWork.OrderItem.Update(orderItem);
             _unitOfWork.Save();
-
+            string message = $"Your Product {orderItem.Product.Name} has been {status}";
             string customerId = orderItem.Order.customerId;
-            await _hubContext.Clients.User(customerId).SendAsync("ReceiveStatusNotification", status, orderItem.OrderItemId, orderItem.Product.Name);
             await _hubContext.Clients.User(customerId).SendAsync("ReceiveStatusUpdate", status, orderItem.OrderItemId, orderItem.Product.Name);
+            await _hubContext.Clients.User(customerId).SendAsync("ReceiveNotification",message);
             return Json(new { success = true });
 
         }

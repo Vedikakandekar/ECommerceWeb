@@ -18,9 +18,9 @@
         <div class="row g-4">
 
 
-            @if (@Model.orderItemsList.Count > 0)
+            @if (@Model.orderItemsList?.Count > 0)
             {
-                @for (int index = 0; index < Model.orderItemsList.Count; index++)
+                @for (int index = 0; index < Model.orderItemsList?.Count; index++)
                 {
                     <!-- Order 1 -->
                     <div class="col-12 col-lg-10 mx-auto">

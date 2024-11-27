@@ -49,7 +49,7 @@ $(document).ready(function () {
         }
     });
 
-    $('#resetBtn').on('click',(function () {
+    $('#resetBtn').on('click',function () {
         $(this).hide();
         $('#searchInput').val('');
         $('#applyBtn').show();
