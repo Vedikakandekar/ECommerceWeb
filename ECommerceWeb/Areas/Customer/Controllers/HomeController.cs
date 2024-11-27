@@ -47,23 +47,15 @@ namespace ECommerceWeb.Areas.Customer.Controllers
         }
         public IActionResult Details(int productId)
         {
-            CartVM cartvm = new CartVM();
+            ProductVM productvm = new ProductVM();
+         
             Products product = _unitOfWork.Product.Get(u => u.Id == productId, includeProperties: "Category");
-            if (_userManager.GetUserId(User) == null)
-            {
-                cartvm.cart.CustomerId = "";
+            
+            
+            productvm.Products = product;
+       
 
-            }
-            else
-            {
-                cartvm.cart.CustomerId = _userManager.GetUserId(User);
-            }
-            cartvm.item.ProductId = productId;
-            cartvm.item.Product = product;
-            cartvm.item.Quantity = 0;
-            cartvm.item.Price = (decimal)product.Price;
-
-            return View(cartvm);
+            return View(productvm);
         }
 
         [HttpPost, ActionName("Details")]
