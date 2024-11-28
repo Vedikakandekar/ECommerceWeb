@@ -47,6 +47,7 @@
                         }
                         @if (User.IsInRole(StaticDetails.Role_Customer))
                         {
+                           
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="Customer" asp-controller="Order" asp-action="Index">Orders</a>
                             </li>
@@ -75,7 +76,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="notificationModalLabel">Notifications</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" id="closeModal"class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" id="notificationList">
                       
@@ -94,22 +95,35 @@
         </main>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
     <script>
+       
+        var userId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value"; 
+        
+                
+       
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/orderStatusHub")
             .build();
-        
+
+     
+        const notifications = JSON.parse(sessionStorage.getItem('notifications')) || [];
+
+        updateNotificationList();
+        updateNotificationBadge();
+
+       
+
         connection.on("ReceiveNotification", function (message) {
             addNotification(message);
 
         });
-
         connection.start().catch(function (err) {
             return Console.error(err.toString());
         });
-        let notifications = [];
-        let notificationCount = 0;
+     
+        
 
         function addNotification(message) {
             const notification = {
@@ -118,57 +132,49 @@
                 time: new Date().toLocaleString(),
                 read: false
             };
+          
             notifications.unshift(notification);
+            saveNotifications();
             updateNotificationBadge();
             updateNotificationList();
+           
+        }
+
+        function saveNotifications() {
+            sessionStorage.setItem('notifications', JSON.stringify(notifications));
         }
 
         function updateNotificationBadge() {
-            const badge = document.getElementById('notificationBadge');
-            notificationCount = notifications.filter(n => !n.read).length;
-
-            if (notificationCount > 0) {
-                badge.textContent = notificationCount;
-                badge.style.display = 'inline';
-            } else {
-                badge.style.display = 'none';
-            }
+          
+            const unreadCount = notifications.filter(n => !n.read).length;
+            $('#notificationBadge').text(unreadCount).toggle(unreadCount > 0);
+           
         }
 
         function updateNotificationList() {
-            const notificationList = document.getElementById('notificationList');
-            notificationList.innerHTML = '';
-
+            
+            const list = $('#notificationList').empty();
             notifications.forEach(notification => {
-                const notificationItem = document.createElement('div');
-                notificationItem.className = 'notification-item';
-                notificationItem.innerHTML = `
-                    <p class="mb-0"><strong>${notification.message}</strong></p>
-                    <small class="text-muted">${notification.time}</small>
-                `;
-                notificationList.appendChild(notificationItem);
+                list.append(`
+                        <div class="notification-item border-bottom py-2">
+                            <p class="mb-0"><strong>${notification.message}</strong></p>
+                            <small class="text-muted">${notification.time}</small>
+                        </div>
+                    `);
             });
         }
-
-
-          document.getElementById('notificationIcon').addEventListener('click', () => {
-        console.log("Notification icon clicked, modal opened");
-      
-    });
-
-         document.getElementById('notificationModal').addEventListener('hidden.bs.modal', () => {
-        console.log("Notification modal closed, marking notifications as read");
-        notifications.forEach(notification => {
-            notification.read = true; 
-        });
-        updateNotificationBadge(); 
-    });
-
+        $('#closeModal').on('click', function () {
+           
+            notifications.forEach(notification => notification.read = true);
+            saveNotifications();
             updateNotificationBadge();
+
+            
+        });
+
+        
      
     </script>
-
-
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2024 - ECommerceWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>

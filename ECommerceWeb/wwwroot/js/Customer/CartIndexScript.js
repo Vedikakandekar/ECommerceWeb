@@ -128,11 +128,11 @@
         event.preventDefault();
         const selectedAddress = getSelectedAddress();
         let subtotal = parseFloat($('#subtotal').text().replace("$", ""));
-        debugger
+        
         if (subtotal > 200000) {
             alert(`Subtotal cannot be greater than 3 lakhs..`);
             return;
-            debugger
+            
         }
         if (selectedAddress==null) {
             alert('Please select a shipping address');
