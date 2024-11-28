@@ -28,6 +28,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             _userManager = userManager;
             _hubContext = hubContext;
         }
+        //gives cart page
         public IActionResult Index()
         {
             string currentLoggedInUSer = _userManager.GetUserId(User);
@@ -51,7 +52,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             return View(cartVM);
         }
 
-
+        //Places Order
         [HttpPost, ActionName("Index")]
         public async Task<IActionResult> IndexPost(CartVM cartVM)
             {
@@ -72,10 +73,12 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 _unitOfWork.Save();
 
                 Order newOrder = _unitOfWork.Order.Get(u=>u.OrderDate==order.OrderDate);
-                 
-             
-                
-                foreach(CartItem listItem in cartVM.cart.CartItems)
+                ConfirmOrderDTO confirmOrderDTO = new ConfirmOrderDTO();
+                confirmOrderDTO.PlacedOrder = order;
+                confirmOrderDTO.ShippingAddress = cartVM.shippingAddress;
+                confirmOrderDTO.OrderItem = new List<OrderItem>();
+
+                foreach (CartItem listItem in cartVM.cart.CartItems)
                 {
                     OrderItem orderItem = new OrderItem();
                     orderItem.OrderId = newOrder.OrderId;
@@ -92,8 +95,11 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                     _unitOfWork.Save();
                     string message = $"Received Order for {orderItem.ProductId} - {listItem.Product.Name} ";
                     await _hubContext.Clients.User(listItem.Product.SellerId).SendAsync("ReceiveNotification", message);
+                 
+                    confirmOrderDTO.OrderItem.Add(orderItem);
+
                 }
-                
+
                
                 Cart cartToRemove = _unitOfWork.Cart.Get(u => u.CartId == cartVM.cart.CartId);
 
@@ -101,14 +107,12 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 _unitOfWork.Save();
                 _unitOfWork.Cart.Remove(cartToRemove);
                 _unitOfWork.Save();
-
-                return RedirectToAction("Index", "Home");
+             
+                return View("ConfirmationPage",confirmOrderDTO);
             }
 
             return RedirectToAction("Error");
         }
-
-
 
 
 

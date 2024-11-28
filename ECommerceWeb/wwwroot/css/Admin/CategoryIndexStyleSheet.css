@@ -19,3 +19,6 @@
         cursor: pointer;
         margin-left: 5px;
     }
+body {
+    background-color: #f0f2f5;
+}

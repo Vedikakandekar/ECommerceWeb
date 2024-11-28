@@ -1,0 +1,21 @@
+﻿body {
+    background-color: #f0f2f5;
+}
+
+.order-confirmation {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.product-card {
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+        transform: translateY(-5px);
+    }
+
+.shipping-address {
+    border-radius: 8px;
+    padding: 10px;
+}
