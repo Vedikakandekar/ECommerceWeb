@@ -40,10 +40,10 @@ $(document).ready(function () {
         }
         else {
             filteredOrders = [];
-            debugger
+           
             allOrders.forEach(o => {
                 if (o.Status.StatusName == currentStatus) {
-                    debugger
+                  
                     console.log(o.Status.StatusName);
                     console.log(currentStatus);
                     filteredOrders.push(o);

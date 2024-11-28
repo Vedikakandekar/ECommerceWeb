@@ -23,13 +23,17 @@
             if (isNaN(quantity)) {
                 quantity = 0;
             }
-            quantity += 1;
-            subtotal = price * quantity;
-            $(`#product-quantity-${item.ProductId}`).text(quantity);
-            $(`#product-quantity-${item.ProductId}`).val(quantity);
-            $(`#product-totalprice-${item.ProductId}`).text("Total: $ " + subtotal);
-            $(`#quantityInput-${item.ProductId}`).val(quantity);
-            updateSummary();
+
+            if (quantity < item.Product.stock) {
+                quantity += 1;
+                subtotal = price * quantity;
+                $(`#product-quantity-${item.ProductId}`).text(quantity);
+                $(`#product-quantity-${item.ProductId}`).val(quantity);
+                $(`#product-totalprice-${item.ProductId}`).text("Total: $ " + subtotal);
+                $(`#quantityInput-${item.ProductId}`).val(quantity);
+                updateSummary();
+            }
+           
         });
         $(`#product-quantity-decrement-${item.ProductId}`).on('click', function () {
             let subtotal = 0;
@@ -78,7 +82,7 @@
         });
     }
     $('#addNewAddressBtn').on('click', function () {
-        debugger
+       
         $('#shippingOverlay').css('display', 'flex');
     });
     $('#cancelBtn').on('click', function () {
@@ -120,14 +124,31 @@
         $('#AddressForm')[0].reset();
     });
 
-    $('#OrderForm').on('submit', function () {
+    $('#OrderForm').on('submit', function (event) {
+        event.preventDefault();
         const selectedAddress = getSelectedAddress();
-        if (selectedAddress) {
-            alert(`Proceeding to payment with address:\nName: ${selectedAddress.name}\nAddress: ${selectedAddress.address}`);
-            OrderForm.submit();
+        let subtotal = parseFloat($('#subtotal').text().replace("$", ""));
+        debugger
+        if (subtotal > 200000) {
+            alert(`Subtotal cannot be greater than 3 lakhs..`);
+            return;
+            debugger
         }
-        else {
+        if (selectedAddress==null) {
             alert('Please select a shipping address');
+            return;
         }
+        for (let i = 0; i < cartItemList.length; i++) {
+            const item = cartItemList[i];
+       
+            console.log(item.Product.stock)
+            if (item.Product.stock <= 0) {
+               
+                alert(`Product ${item.Product.Name} is out of stock...Cannot Place Order !!`);
+                return;
+            }
+        }
+        alert(`Proceeding to payment with address:\nName: ${selectedAddress.name}\nAddress: ${selectedAddress.address}`);
+        this.submit();
     });
 });

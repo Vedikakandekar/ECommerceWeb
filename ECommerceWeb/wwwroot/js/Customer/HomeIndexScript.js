@@ -67,7 +67,7 @@
         let price = $('#price-filter').val();
 
         if (searchTearm.trim() != '' || category != "-Select Category-" || price != "-Sort by Price-") {
-            debugger
+            
             $(this).hide();
             $('#resetBtn').show();
             $('#price-filter').prop('disabled', true);

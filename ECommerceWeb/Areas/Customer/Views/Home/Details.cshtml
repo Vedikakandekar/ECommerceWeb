@@ -1,11 +1,11 @@
-﻿@model CartVM
+﻿@model DetailsDTO
 
 <form method="post">
     <div class="card shadow border-0 mt-4 mb-4">
         <div class="card-header  bg-primary text-white text-center bg-gradient text-nlack py-4">
             <div class="row">
                 <div class="col-12 bg-primary text-white text-center">
-                    <h3 class="bg-primary text-white text-center text-uppercase">@Model.item.Product.Name</h3>
+                    <h3 class="bg-primary text-white text-center text-uppercase">@Model.Product.Name</h3>
                    
                 </div>
             </div>
@@ -19,43 +19,50 @@
                         </a>
                     </div>
                 </div>
-                <input asp-for="item.Product.ImageUrl" hidden />
-                <input asp-for="item.Product.SellerId" hidden />
-                <input asp-for="item.Product.CategoryId" hidden />
-                <input asp-for="item.Product.Name" hidden />
-                <input asp-for="item.Product.Price" hidden />
-                <input asp-for="item.Product.Description" hidden />
-                <input asp-for="item.Product.stock" hidden />
+                <input asp-for="Product.ImageUrl" hidden />
+                <input asp-for="Product.SellerId" hidden />
+                <input asp-for="Product.CategoryId" hidden />
+                <input asp-for="Product.Name" hidden />
+                <input asp-for="Product.Price" hidden />
+                <input asp-for="Product.Description" hidden />
+                <input asp-for="Product.stock" hidden />
                 <div class="row">
                     <div class="col-12 col-lg-3 offset-lg-1 text-center mb-3">
                         
                         <div style="height:200px; display:flex; justify-content:center; align-items:center;" class="align-middle">
-                            <img src="@Model.item.Product.ImageUrl" class="card-img-top" alt="@Model.item.Product.Name" style="object-fit:cover;" />
+                            <img src="@Model.Product.ImageUrl" class="card-img-top" alt="@Model.Product.Name" style="object-fit:cover;" />
                         </div>
                     </div>
                     <div class="col-12 col-lg-6 offset-lg-1">
-                        <div class="col-12 col-md-6 pb-4">
-                            <span class="badge">@Model.item.Product.Category.Name</span>
-                        </div>
+                       
 
                         <div class="row ps-2">
                             <h6 class="text-dark text-opacity-50  pb-2">
                                 Price:
                                 <span>
-                                    @Model.item.Product.Price.ToString("c")
+                                    @Model.Product.Price.ToString("c")
                                 </span>
                             </h6>
                         </div>
 
                         <div class="row pl-2 my-3">
-                            <p class="text-secondary lh-sm">@Html.Raw(Model.item.Product.Description)</p>
+                            <p class="text-secondary lh-sm">@Html.Raw(Model.Product.Description)</p>
                         </div>
                   
                         <div class="row">
                             <div class="col-12 col-md-6 pb-1">
-                                <button type="submit"  class="btn btn-primary bg-gradient  w-100 py-2 text-uppercase fw-semibold">
-                                    Add to Cart
-                                </button>
+                                @if (!Model.IsInCart)
+                                {
+                                    <button type="submit"  class="btn btn-primary bg-gradient  w-100 py-2 text-uppercase fw-semibold">
+                                        Add to Cart
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a  asp-area="Customer" asp-controller="Cart" asp-action="Index" class="btn btn-primary bg-gradient  w-100 py-2 text-uppercase fw-semibold">
+                                        Go to Cart
+                                    </a>
+                                }
                             </div>
                         </div>
                     </div>

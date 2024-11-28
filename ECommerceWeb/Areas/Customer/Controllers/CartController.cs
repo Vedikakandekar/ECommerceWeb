@@ -58,7 +58,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             string currentLogedInUser = _userManager.GetUserId(User);
             if (currentLogedInUser == null || cartVM.cart.CartItems.Count==0)
             {
-                return View("Error");
+                return View("Login");
             }
 
             if (ModelState.IsValid)
