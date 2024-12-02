@@ -1,0 +1,77 @@
+﻿
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-5">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search products">
+        </div>
+
+        <div class="col-md-3">
+            <select id="category-filter" asp-items="@Model.CategoryList" class="form-select">
+                <option selected>-Select Category-</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="price-filter" class="form-select">
+                <option>-Sort by Price-</option>
+                <option value="low-to-high">Low to High</option>
+                <option value="high-to-low">High to Low</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="button" id="searchBtn" class="btn btn-primary btn-sm form-control">Apply</button>
+            <button type="button" id="resetBtn" class="btn btn-primary btn-sm form-control" style="display:none;"><i class="bi bi-arrow-counterclockwise"></i>Clear</button>
+        </div>
+    </div>
+</div>
+<template id="product-template">
+    <div class="col-lg-3 col-sm-6">
+        <div class="row p-2">
+            <div class="col-12 p-1">
+                <div class="card border-0 p-3 shadow border-top border-5 rounded card-hover-effect d-flex justify-content-center align-items-center">
+                    <div style="width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; overflow: hidden;" class="align-middle">
+                        <img src="" class="card-img-top" alt="Product Image" style="width: 100%; height: 100%; object-fit: contain;" />
+                    </div>
+
+                    <div class="card-body pb-0">
+                        <div class="pl-1">
+                            <p class="card-title h6 text-dark opacity-75 text-uppercase text-center"></p>
+                        </div>
+                        <div class="pl-1">
+                            <p class="text-dark text-opacity-75 text-center mb-1">
+                                Price: <span class="text-dark text-opacity-75 text-center"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-primary bg-gradient border-0 form-control">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<div class="row pb-3" id="products-container">
+</div>
+<nav aria-label="Product pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+       
+
+    </ul>
+</nav>
+<style>
+
+    .card-hover-effect {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card-hover-effect:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+<script src="~/js/Customer/HomePartialIndexScript.js"></script>

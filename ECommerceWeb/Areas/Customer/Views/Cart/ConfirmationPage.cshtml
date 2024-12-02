@@ -24,11 +24,11 @@
                         <div class="card product-card h-100">
                             <div class="card-body">
                                     <div class="d-flex ">
-                                        <div class="d-flex justify-content-center align-items-center " style="height: 80px; width: 80px; overflow: hidden;">
-                                            <img src="@item.Product.ImageUrl" alt="Responsive Image" class="img-fluid" style="max-height: 100%; max-width: 100%;">
+                                        <div class="d-flex justify-content-center align-items-center pr-4" style="height: 100px; width: 100px; overflow: hidden;">
+                                            <img src="@item.Product.ImageUrl" alt="Responsive Image" class="img-fluid p-2" style="max-height: 100%; max-width: 100%;">
                                         </div>
-                                    <div class="ml-2">
-                                        <h5 class="card-title"> @item.Product.Name</h5>
+                                    <div class="pl-2">
+                                            <h5 class="card-title"> @(item.Product.Name.Length > 20 ? item.Product.Name.Substring(0, 20) + "..." : item.Product.Name)</h5>
                                         <p class="card-text mb-1">Quantity: @item.Quantity</p>
                                         <p class="card-text">Price: $@item.UnitPrice each</p>
                                     </div>

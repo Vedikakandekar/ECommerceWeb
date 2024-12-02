@@ -24,17 +24,52 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
+        public IActionResult GetProducts(string search = "",string category = "",string priceOrder = "",int page = 1,int pageSize = 8)
+        {
+            var productQuery = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category");
+
+            if (!string.IsNullOrEmpty(search))
+                productQuery = productQuery.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrEmpty(category) && category != "-Select Category-")
+                productQuery = productQuery.Where(p => p.Category.Name == category);
+
+            if (priceOrder == "low-to-high")
+                productQuery = productQuery.OrderBy(p => p.Price);
+            else if (priceOrder == "high-to-low")
+                productQuery = productQuery.OrderByDescending(p => p.Price);
+
+            var totalItems = productQuery.Count();
+            var products = productQuery.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            return Json(new
+            {
+                currentPage = page,
+                totalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                products = products.Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    ImageUrl = p.ImageUrl.Replace("\\", "/"),
+                    Category = p.Category.Name
+                })
+            });
+
+
+        }
         public IActionResult Index()
         {
-            AllProductsVM productVM = new AllProductsVM();
-            List<Products> productList = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category").ToList();
-            productVM.ProductList = productList;
-            productVM.CategoryList = _unitOfWork.Category.GetAll().ToList().Select(x => x.Name).Select(i => new SelectListItem
+            var model = new AllProductsVM
             {
-                Text = i,
-                Value = i
-            });
-            return View(productVM);
+                ProductList = _unitOfWork.Product.GetAll().ToList(),
+                CategoryList = new SelectList(_unitOfWork.Category.GetAll(), "Id", "Name"),
+                CurrentPage = 1, 
+                TotalPages = 5,  
+                PageSize = 4     
+            };
+
+            return View(model);
         }
         public IActionResult Privacy()
         {

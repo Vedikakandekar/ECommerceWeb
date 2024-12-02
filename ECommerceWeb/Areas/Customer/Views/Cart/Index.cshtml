@@ -34,7 +34,7 @@
                                             <div class="card-body">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div>
-                                                        <h6 class="my-0">@item.Product.Name</h6>
+                                                        <h6 class="my-0">@(item.Product.Name.Length > 20 ? item.Product.Name.Substring(0, 20) + "..." : item.Product.Name)</h6>
                                                         <input asp-for="cart.CartItems[index].Product.Name" hidden />
                                                         @if(Model.cart.CartItems[index].Product.stock<1)
                                                     {
