@@ -1,6 +1,6 @@
 ﻿
 $(document).ready(function () {
-    debugger
+    
     let currentPage = 1; 
     
     const pageSize = 8; 
@@ -9,7 +9,7 @@ $(document).ready(function () {
         const search = $('#searchInput').val().trim();
         const category = $('#category-filter').val();
         const priceOrder = $('#price-filter').val();
-        debugger
+        
         $.ajax({
             url: '/Customer/Home/GetProducts',
             type: 'GET',
@@ -21,7 +21,7 @@ $(document).ready(function () {
                 pageSize: pageSize
             },
             success: function (response) {
-                debugger
+              
                 renderProducts(response.products);
                 renderPagination(response.currentPage, response.totalPages);
             },
@@ -33,7 +33,7 @@ $(document).ready(function () {
 
   
     function renderProducts(products) {
-        debugger
+        
         const $container = $('#products-container');
         const $template = $('#product-template').html();
         $container.empty();
@@ -49,9 +49,20 @@ $(document).ready(function () {
             $img.attr('alt', product.name);
             $img.attr('id', `product-image-${product.id}`);
 
-            const $name = $clone.find('.card-title');
+            const $like = $clone.find('i');
+            $like.attr('id', `like-${product.id}`);
+            const ProductID = product;
+            const isLiked = product.IsLiked;
             debugger
-            const truncatedName = product.name.length > 20 ? product.name.substring(0, 40) + '...' : product.name;
+            if (product.isLiked) {
+                $like.addClass('likedIt');
+            }
+            else {
+                $like.removeClass('likedIt');
+            }
+           
+            const $name = $clone.find('.card-title');
+            const truncatedName = product.name.length > 20 ? product.name.substring(0, 20) + '...' : product.name;
             $name.text(truncatedName || 'Unnamed Product');
             $name.attr('id', `product-name-${product.id}`);
 
@@ -65,6 +76,39 @@ $(document).ready(function () {
             $detailsButton.attr('id', `details-button-${product.id}`);
 
             $container.append($clone);
+       
+        });
+     
+        debugger
+        $.each(products, function (index, product) {
+            $(`#like-${product.id}`).on('click', function () {
+                debugger
+                $.ajax({
+                    url: '/Customer/Home/likes',
+                    type: 'GET',
+                    data: {
+                        productId: product.id
+                    },
+                    success: function (response) {
+
+                        if (response.message == "ADDED") {
+                            $(`#like-${product.id}`).addClass('likedIt');
+                        }
+                        else if (response.message == "NOT-LOGGED-IN") {
+                            alert("Please Login first to add Product in wishlist..!!");
+                        }
+                        else if (response.message == "PRODUCT-NOT-FOUND" || response.message == "BAD-REQUEST") {
+                            alert("Something Went wrong with product..Product Not found!!!");
+                        }
+                        else if (response.message == "REMOVED") {
+                            $(`#like-${product.id}`).removeClass('likedIt');
+                        }
+                    },
+                    error: function () {
+                        alert('Failed to fetch products. Please try again later.');
+                    }
+                });
+            })
         });
     }
 
@@ -105,9 +149,8 @@ $(document).ready(function () {
     });
 
     $('#searchBtn').on('click', function () {
-       
-        if ($('#searchInput').val().trim() != '' || $('#category-filter').val() != "-Select Category-" || $('#price-filter') != "-Sort by Price-") {
 
+        if ($('#searchInput').val().trim() != '' || $('#category-filter').val() != "-Select Category-" || $('#price-filter').val() != "-Sort by Price-") {
             $(this).hide();
             $('#resetBtn').show();
             $('#price-filter').prop('disabled', true);

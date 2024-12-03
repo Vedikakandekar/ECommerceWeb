@@ -37,6 +37,8 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 return View("Login");
             }
             CartVM cartVM = new CartVM();
+            cartVM.shippingAddress.CustomerId = currentLoggedInUSer;
+            cartVM.addressList = _unitOfWork.ShippingAddress.GetAll(u => u.CustomerId == currentLoggedInUSer).ToList();
             cartVM.cart = _unitOfWork.Cart.Get(u => u.CustomerId == currentLoggedInUSer);
             if(cartVM.cart==null)
             {
@@ -47,8 +49,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             cartVM.subtotal = (float)cartVM.cart.CartItems.Sum(item => item.Quantity * item.Price);
             cartVM.shippingFees = 50;
             cartVM.total = cartVM.subtotal + cartVM.shippingFees;
-            cartVM.shippingAddress.CustomerId = currentLoggedInUSer;
-            cartVM.addressList = _unitOfWork.ShippingAddress.GetAll(u => u.CustomerId == currentLoggedInUSer).ToList();
+           
             return View(cartVM);
         }
 

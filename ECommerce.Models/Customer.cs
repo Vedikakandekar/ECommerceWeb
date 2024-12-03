@@ -3,7 +3,7 @@
     public class Customer : User
     {
 
-        public List<string>? Notifications { get; set; }
- 
+        public virtual ICollection<Likes>? Likes { get; set; }
+
     }
 }

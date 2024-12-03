@@ -11,5 +11,7 @@ namespace ECommerce.Models.ViewModels
         public Products Product { get; set; }
 
         public bool IsInCart {  get; set; }
+
+        public bool? IsInLikes { get; set; }
     }
 }

@@ -11,16 +11,20 @@
   
 </head>
 <body>
-    <div class="container my-5">
-        <header class="bg-primary text-white text-center py-3 mb-2 col-12 col-lg-10 mx-auto">
-            <h4 class="display-4">Your Orders</h4>
-            <div class="d-flex justify-content-end">
-                <div class="col-md-3 m-1">
+    <div class="container my-4 ">
+        <header class="bg-primary text-white  py-2 mx-auto">
+            <div class="row g-0">
+
+                <div class="col-md-9 ps-5">
+                <h4 class="display-4">Your Orders</h4>
+                </div>
+
+                <div class="col-md-3 mt-3 pe-2">
                     <select id="status-filter" asp-items="@Model.StatusList"  class="form-select">
                         <option value="default" selected>-Filter by status-</option>
                     </select>
                 </div>
-            </div>
+           </div>
         </header>
 
   
@@ -31,15 +35,15 @@
                     <div class="row g-0">
                         <div class="col-md-4 position-relative">
                             <img class="order-image" alt="Image">
-                            <span class="order-date"></span>
+                            <span class="order-date text-dark"></span>
                             <span class="order-state"></span>
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h5 class="card-title"></h5>
+                                <h5 class="card-title text-dark"></h5>
                                 <p class="card-text description"></p>
-                                <p class="card-text quantity"></p>
-                                <p class="card-text total-price"></p>
+                                <p class="card-text text-dark quantity"></p>
+                                <p class="card-text text-dark total-price"></p>
                                 <p class="card-text shipping-address"></p>
                             </div>
                         </div>

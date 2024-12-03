@@ -24,6 +24,8 @@ namespace ECommerce.Data.Repository.IRepository
 
         IOrderItemStatusRepository OrderItemStatus { get; }
 
+        ILikesRepository Likes { get; }
+
         void Save();
     }
 }

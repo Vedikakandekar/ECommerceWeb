@@ -19,6 +19,8 @@ namespace ECommerce.Data
         public DbSet<ShippingAddress> ShippingAddress { get; set; }
 
         public DbSet<OrderItemStatus> OrderItemStatus { get; set; }
+
+        public DbSet<Likes> Likes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -53,7 +55,20 @@ namespace ECommerce.Data
                 .HasForeignKey(oi => oi.OrderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Likes>()
+                .HasKey(l => l.Id);
 
+            modelBuilder.Entity<Likes>()
+                .HasOne(l => l.customer)
+                .WithMany(u => u.Likes) // Assuming the User class has a Likes collection
+                .HasForeignKey(l => l.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Likes>()
+                .HasOne(l => l.product)
+                .WithMany(p => p.Likes) // Assuming the Product class has a Likes collection
+                .HasForeignKey(l => l.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Category>().HasData(
                     new Category { Id = 1, Name = "Clothing-Mens", Description = "Explore the Clothing Section curated exclusively for Men.." },

@@ -43,5 +43,7 @@ namespace ECommerce.Models
         [ForeignKey("SellerId")]
         public Seller Seller { get; set; }
 
+        public virtual ICollection<Likes>? Likes { get; set; }
+
     }
 }

@@ -130,7 +130,7 @@
         let subtotal = parseFloat($('#subtotal').text().replace("$", ""));
         
         if (subtotal > 200000) {
-            alert(`Subtotal cannot be greater than 3 lakhs..`);
+            alert(`Subtotal cannot be greater than 2 lakhs..`);
             return;
             
         }

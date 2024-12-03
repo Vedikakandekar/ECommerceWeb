@@ -1,11 +1,12 @@
-﻿@model DetailsDTO
+﻿@using Newtonsoft.Json
+@model DetailsDTO
 
 <form method="post">
     <div class="card shadow border-0 mt-4 mb-4">
         <div class="card-header  bg-primary text-white text-center bg-gradient text-nlack py-4">
             <div class="row">
                 <div class="col-12 bg-primary text-white text-center">
-                    <h3 class="bg-primary text-white text-center text-uppercase">@Model.Product.Name</h3>
+                    <h4 class="bg-primary text-white text-center text-uppercase">@Model.Product.Name</h4>
                    
                 </div>
             </div>
@@ -37,16 +38,16 @@
                        
 
                         <div class="row ps-2">
-                            <h6 class="text-dark text-opacity-50  pb-2">
+                            <h5 class="text-dark   pb-2">
                                 Price:
                                 <span>
                                     @Model.Product.Price.ToString("c")
                                 </span>
-                            </h6>
+                            </h5>
                         </div>
 
                         <div class="row pl-2 my-3">
-                            <p class="text-secondary lh-sm">@Html.Raw(Model.Product.Description)</p>
+                            <p class="text-dark text-opacity-40">@Model.Product.Description</p>
                         </div>
                   
                         <div class="row">
@@ -64,6 +65,17 @@
                                     </a>
                                 }
                             </div>
+                            <div class="col-12 col-md-6 pb-1">
+                                @if(Model.IsInLikes==null)
+                                {
+                                    <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Add to WishList</a>
+                                }
+                               else
+                               {
+                                    <button type="button" id="AddToWishListBtn" class="btn btn-primary bg-gradient  w-100 py-2 text-uppercase fw-semibold">
+                                        @(!(bool)Model.IsInLikes?"Add to WishList":"Remove From WishList")</button>
+                               }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -71,3 +83,9 @@
         </div>
     </div>
 </form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+const product = @Html.Raw(JsonConvert.SerializeObject(Model.Product, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+debugger
+</script>
+<script src="~/js/Customer/DetailsScript.js"></script>

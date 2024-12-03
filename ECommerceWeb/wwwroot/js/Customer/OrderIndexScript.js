@@ -10,13 +10,15 @@ $(document).ready(function () {
         filteredOrders.forEach(orderItem => {
             const clone = $(orderTemplate).clone();
             clone.find('.order-image').attr('src', orderItem.Product.ImageUrl);
-            clone.find('.order-date').text(orderItem.Order.OrderDate);
+            clone.find('.order-date').text(formatDate(orderItem.Order.OrderDate));
             clone.find('.order-state')
                 .addClass(getStateClass(orderItem.Status.StatusName))
                 .attr('id', `productStatus+${orderItem.OrderItemId}`)
                 .text(orderItem.Status.StatusName);
-            clone.find('.card-title').text(orderItem.Product.Name);
-            clone.find('.description').text(orderItem.Product.Description);
+            const truncatedName = orderItem.Product.Name.length > 50 ? orderItem.Product.Name.substring(0, 20) + '...' : orderItem.Product.Name;
+            clone.find('.card-title').text(truncatedName);
+            const truncatedDesc = orderItem.Product.Description.length > 50 ? orderItem.Product.Description.substring(0, 30) + '...' : orderItem.Product.Description;
+            clone.find('.description').text(truncatedDesc);
             clone.find('.quantity').text(`Quantity: ${orderItem.Quantity}`);
             clone.find('.total-price').text(`Total Price: $${orderItem.TotalPrice}`);
             clone.find('.shipping-address').html(`
@@ -26,8 +28,13 @@ $(document).ready(function () {
                                     `);
             orderList.append(clone);
         });
+        
     }
-
+    function formatDate(dateString) {
+        const date = new Date(dateString); 
+        if (isNaN(date)) return "Invalid Date"; 
+        return date.toISOString().split('T')[0]; 
+    }
 
     renderOrders();
 

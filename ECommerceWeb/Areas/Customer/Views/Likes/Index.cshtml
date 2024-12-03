@@ -1,0 +1,34 @@
+﻿@model AllProductsVM
+   
+        <div class="row pb-4">
+                @foreach (Products products in Model.ProductList)
+                {
+
+        <div class="col-lg-3 col-sm-6 p-3">
+                <div class="card border-0 p-3 shadow border-top border-5 rounded card-hover-effect d-flex justify-content-center align-items-center">
+
+                    <div style="width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; overflow: hidden;" class="align-middle">
+                        <img src="@products.ImageUrl" class="card-img-top" alt="Product Image" style="width: 100%; height: 100%; object-fit: contain;" />
+
+                    </div>
+
+                    <div class="card-body pb-0">
+                        <div class="pl-1">
+                            <p class="card-title h6 text-dark opacity-75 text-uppercase text-center">@(products.Name.Length>30?products.Name.Substring(0,30)+"...":products.Name)</p>
+                        </div>
+                        <div class="pl-1">
+                            <p class="text-dark text-opacity-75 text-center mb-1">
+                                Price: <span class="text-dark text-opacity-75 text-center">@products.Price</span>
+                            </p>
+                        </div>
+                        <a  asp-action="Details" asp-controller="Home" asp-area="Customer" asp-route-productId="@products.Id" class="btn btn-primary bg-gradient border-0 form-control">Details</a>
+                    </div>
+                </div>
+        </div>
+                 }     
+        </div>
+
+<nav aria-label="Product pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+    </ul>
+</nav>

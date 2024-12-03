@@ -70,7 +70,8 @@ function renderProducts() {
         productHtml.find('#edit-product').attr('href', `/seller/product/Upsert?id=${product.id}`);
         productHtml.find('#delete-product').attr('href', `/seller/product/delete?id=${product.id}`);
         productHtml.find('#product-img').attr('src', `${product.imageUrl}`);
-        const truncatedName = product.name.length > 20 ? product.name.substring(0, 80) + '...' : product.name;
+        
+        const truncatedName = product.name.length > 20 ? product.name.substring(0, 30) + '...' : product.name;
         productHtml.find('#product-name').text(truncatedName);
         productHtml.find('#product-category').text(product.category.name);
         productHtml.find('#product-price').text(product.price);

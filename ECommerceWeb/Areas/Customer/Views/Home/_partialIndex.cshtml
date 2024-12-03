@@ -28,8 +28,11 @@
         <div class="row p-2">
             <div class="col-12 p-1">
                 <div class="card border-0 p-3 shadow border-top border-5 rounded card-hover-effect d-flex justify-content-center align-items-center">
+
+                    <i class="bi bi-heart-fill heart-icon"></i>
                     <div style="width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; overflow: hidden;" class="align-middle">
                         <img src="" class="card-img-top" alt="Product Image" style="width: 100%; height: 100%; object-fit: contain;" />
+                       
                     </div>
 
                     <div class="card-body pb-0">
@@ -41,14 +44,12 @@
                                 Price: <span class="text-dark text-opacity-75 text-center"></span>
                             </p>
                         </div>
+                                 <a href="#" class="btn btn-primary bg-gradient border-0 form-control">Details</a>
                     </div>
-                    <div>
-                        <a href="#" class="btn btn-primary bg-gradient border-0 form-control">Details</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </template>
 
 <div class="row pb-3" id="products-container">
@@ -59,19 +60,3 @@
 
     </ul>
 </nav>
-<style>
-
-    .card-hover-effect {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .card-hover-effect:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-</style>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
-<script src="~/js/Customer/HomePartialIndexScript.js"></script>

@@ -24,15 +24,23 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
-        public IActionResult GetProducts(string search = "",string category = "",string priceOrder = "",int page = 1,int pageSize = 8)
+        public IActionResult GetProducts(string search = "", string category = "", string priceOrder = "", int page = 1, int pageSize = 8)
         {
+            var LikedProducts = new List<Likes>();
+            string currentLoggedInUser = _userManager.GetUserId(User);
+            if (currentLoggedInUser != null)
+            {
+                LikedProducts = _unitOfWork.Likes.GetAll(u => u.CustomerId.Equals(currentLoggedInUser)).ToList();
+            }
+
             var productQuery = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category");
+
 
             if (!string.IsNullOrEmpty(search))
                 productQuery = productQuery.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
 
-            if (!string.IsNullOrEmpty(category) && category != "-Select Category-")
-                productQuery = productQuery.Where(p => p.Category.Name == category);
+            if (!string.IsNullOrEmpty(category) && category != "-Select Category-" && int.TryParse(category, out int result))
+                productQuery = productQuery.Where(p => p.Category.Id == result);
 
             if (priceOrder == "low-to-high")
                 productQuery = productQuery.OrderBy(p => p.Price);
@@ -52,21 +60,72 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                     p.Name,
                     p.Price,
                     ImageUrl = p.ImageUrl.Replace("\\", "/"),
-                    Category = p.Category.Name
+                    Category = p.Category.Name,
+                    IsLiked = LikedProducts.Any(lp => lp.ProductId == p.Id)
                 })
             });
 
 
         }
+        public IActionResult likes(int ProductId)
+        {
+            string currentLoggedInUser = _userManager.GetUserId(User);
+            if (currentLoggedInUser == null)
+            {
+                return Json(new
+                {
+                    message = "NOT-LOGGED-IN"
+                });
+            }
+            if (ProductId == 0)
+            {
+                return Json(new
+                {
+                    message = "PRODUCT-NOT-FOUND"
+                });
+            }
+
+            Likes like = _unitOfWork.Likes.Get(u => (u.ProductId == ProductId && u.CustomerId == currentLoggedInUser));
+            if (like != null)
+            {
+                _unitOfWork.Likes.Remove(like);
+                _unitOfWork.Save();
+                return Json(new
+                {
+                    message = "REMOVED"
+                });
+            }
+
+            Products productToAdd = _unitOfWork.Product.Get(u => u.Id == ProductId);
+            if (productToAdd == null)
+            {
+                return Json(new
+                {
+                    message = "BAD-REQUEST"
+                }); ;
+            }
+            Likes likeToAdd = new Likes();
+            likeToAdd.ProductId = productToAdd.Id;
+            likeToAdd.CustomerId = currentLoggedInUser;
+            _unitOfWork.Likes.Add(likeToAdd);
+            _unitOfWork.Save();
+            return Json(new
+            {
+                message = "ADDED"
+
+            });
+        }
+
+
         public IActionResult Index()
         {
             var model = new AllProductsVM
             {
                 ProductList = _unitOfWork.Product.GetAll().ToList(),
                 CategoryList = new SelectList(_unitOfWork.Category.GetAll(), "Id", "Name"),
-                CurrentPage = 1, 
-                TotalPages = 5,  
-                PageSize = 4     
+                CurrentPage = 1,
+                TotalPages = 5,
+                PageSize = 4
             };
 
             return View(model);
@@ -84,13 +143,14 @@ namespace ECommerceWeb.Areas.Customer.Controllers
         {
             DetailsDTO dto = new DetailsDTO();
 
+            string currentLoggedInUser = _userManager.GetUserId(User);
             Products product = _unitOfWork.Product.Get(u => u.Id == productId, includeProperties: "Category");
 
             if (product != null)
             {
                 dto.Product = product;
                 CartItem itemList = _unitOfWork.CartItem.Get(u => u.Product.Id == product.Id, includeProperties: "Product");
-                if(itemList != null)
+                if (itemList != null)
                 {
                     dto.IsInCart = true;
                 }
@@ -98,8 +158,24 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 {
                     dto.IsInCart = false;
                 }
-                    
-                return View(dto);
+
+                if (string.IsNullOrEmpty(currentLoggedInUser))
+                {
+                    dto.IsInLikes = null;
+                }
+                else
+                {
+                  Likes like =  _unitOfWork.Likes.Get(u => u.CustomerId == currentLoggedInUser && u.ProductId==product.Id);
+                    if(like==null)
+                    {
+                        dto.IsInLikes = false;
+                    }
+                    else
+                    {
+                        dto.IsInLikes = true;
+                    }
+                }
+                        return View(dto);
             }
             return View("Error");
         }
@@ -172,7 +248,7 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 return Json(new EmptyResult());
             }
             List<Products> ProductList = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category").ToList();
-            List<Products> FilteredProducts = ControllerHelper.FilterProductList(ProductList, searchString, categoryFilter,priceFilter);
+            List<Products> FilteredProducts = ControllerHelper.FilterProductList(ProductList, searchString, categoryFilter, priceFilter);
             return Json(new { success = true, products = FilteredProducts });
         }
 

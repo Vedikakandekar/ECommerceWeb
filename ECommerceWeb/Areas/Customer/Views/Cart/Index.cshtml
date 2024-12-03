@@ -39,6 +39,7 @@
                                                         @if(Model.cart.CartItems[index].Product.stock<1)
                                                     {
                                                         <span class="text-danger me-2" id="product-out-of-stock" value="true">Currently Out of stock</span>
+                                                       
                                                     }
                                                         <input asp-for="cart.CartItems[index].Product.Description" hidden />
                                                         <input asp-for="cart.CartItems[index].Product.Id" type="hidden" />
