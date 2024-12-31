@@ -1,11 +1,13 @@
 using ECommerce.Data;
 using ECommerce.Data.Repository;
 using ECommerce.Data.Repository.IRepository;
+using ECommerce.Data.Services;
 using ECommerce.Models;
 using ECommerce.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +21,14 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials()
-               .SetIsOriginAllowed(origin => true); // Allows any origin
+               .SetIsOriginAllowed(origin => true); 
     });
 });
+
+builder.Services.AddMemoryCache();
+
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
@@ -36,13 +39,21 @@ builder.Services.ConfigureApplicationCookie(options => {
     options.ExpireTimeSpan = TimeSpan.FromDays(1);
     options.SlidingExpiration = true;
 });
+builder.Services.AddSingleton(MemoryCache.Default);
+builder.Services.AddSingleton<ICompanySettingsCacheRepository, ProductsCacheRepository>();
 
-builder.Services.AddRazorPages();
-builder.Services.AddAuthorization();
-//builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
 
 builder.Services.AddIdentity<IdentityUser,IdentityRole>(options=> options.SignIn.RequireConfirmedAccount=false).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = builder.Configuration.GetSection("GoogleAuthSettings").GetValue<string>("ClientId");
+                    options.ClientSecret = builder.Configuration.GetSection("GoogleAuthSettings").GetValue<string>("ClientSecret");
+                });
+builder.Services.AddAuthorization();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddHostedService<CacheLoaderService>();
+builder.Services.AddRazorPages();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -52,6 +63,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();

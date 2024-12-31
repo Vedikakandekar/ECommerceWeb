@@ -18,11 +18,13 @@ namespace ECommerceWeb.Areas.Customer.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<IdentityUser> _userManager;
-        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager)
+        private readonly ICompanySettingsCacheRepository _productCache;
+        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager, ICompanySettingsCacheRepository productCache)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _productCache = productCache;
         }
         public IActionResult GetProducts(string search = "", string category = "", string priceOrder = "", int page = 1, int pageSize = 8)
         {
@@ -33,19 +35,25 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                 LikedProducts = _unitOfWork.Likes.GetAll(u => u.CustomerId.Equals(currentLoggedInUser)).ToList();
             }
 
-            var productQuery = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category");
+            List<Products> productQuery = _productCache.GetAllProducts();
 
+            if(productQuery.Count==0)
+            {
+               productQuery = _unitOfWork.Product.GetAll(u => u.stock > 0, includeProperties: "Category").ToList();
+                _productCache.Loadproducts(productQuery);
+                Console.WriteLine("[x] Info :Loaded from DB ");
+            }
 
             if (!string.IsNullOrEmpty(search))
-                productQuery = productQuery.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+                productQuery = productQuery.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
 
             if (!string.IsNullOrEmpty(category) && category != "-Select Category-" && int.TryParse(category, out int result))
-                productQuery = productQuery.Where(p => p.Category.Id == result);
+                productQuery = productQuery.Where(p => p.Category.Id == result).ToList();
 
             if (priceOrder == "low-to-high")
-                productQuery = productQuery.OrderBy(p => p.Price);
+                productQuery = productQuery.OrderBy(p => p.Price).ToList();
             else if (priceOrder == "high-to-low")
-                productQuery = productQuery.OrderByDescending(p => p.Price);
+                productQuery = productQuery.OrderByDescending(p => p.Price).ToList();
 
             var totalItems = productQuery.Count();
             var products = productQuery.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -60,7 +68,6 @@ namespace ECommerceWeb.Areas.Customer.Controllers
                     p.Name,
                     p.Price,
                     ImageUrl = p.ImageUrl.Replace("\\", "/"),
-                    Category = p.Category.Name,
                     IsLiked = LikedProducts.Any(lp => lp.ProductId == p.Id)
                 })
             });
@@ -144,9 +151,16 @@ namespace ECommerceWeb.Areas.Customer.Controllers
             DetailsDTO dto = new DetailsDTO();
 
             string currentLoggedInUser = _userManager.GetUserId(User);
-            Products product = _unitOfWork.Product.Get(u => u.Id == productId, includeProperties: "Category");
-
-            if (product != null)
+            //  Products product = 
+            Products? product = _productCache.GetFeatureValue(productId);
+            if(product==null)
+            {
+                Products pro = _unitOfWork.Product.Get(u => u.Id == productId, includeProperties: "Category");
+                if (pro != null)
+                    _productCache.AddFeatureToCache(pro);
+                Console.WriteLine("[x] Info :Took from DB ");
+            }
+           else
             {
                 dto.Product = product;
                 CartItem itemList = _unitOfWork.CartItem.Get(u => u.Product.Id == product.Id, includeProperties: "Product");

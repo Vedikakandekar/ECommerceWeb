@@ -1,0 +1,71 @@
+﻿@model List<CompanySettings> 
+<div class="align-content-center">
+
+    <input id ="companyNameBtn" class="form-control  m-3" type="text" placeholder="Enter Setting Name">
+    <input id="companyValueBtn" class="form-control  m-3" type="text" placeholder="Enter Setting Value">
+    <button type="button" id="updateSettingBtn" class="btn btn-primary">Update company setting</button>
+
+</div>   
+
+
+<div>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int count = 1;
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.Name</td>
+                        <td>@item.Value</td>
+                    </tr>
+                    count++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">No Company Settings Found</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#updateSettingBtn").on('click', function () {
+            let name = $("#companyNameBtn").val();
+            let value = $("#companyValueBtn").val();
+            debugger
+            $.ajax({
+                url: '/Customer/CompanySettings/UpdateSettings',
+                type: 'GET',
+                data: {
+                    SettingName: name,
+                    SettingValue: value
+                },
+                datatype: 'json',
+                success: function (data) {
+                    if (data.success) {
+                        console.log("Updated");
+                    }
+                },
+                error: function (jqXHR, textStatus, err) {
+                    console.log("AJX Error : ", textStatus, err)
+                }
+            });
+
+        });
+    });
+</script>

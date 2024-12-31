@@ -26,6 +26,8 @@ namespace ECommerce.Data.Repository.IRepository
 
         ILikesRepository Likes { get; }
 
+        ICompanySettingsRepository CompanySettings { get; }
+
         void Save();
     }
 }

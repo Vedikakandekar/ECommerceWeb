@@ -25,6 +25,9 @@ namespace ECommerce.Data.Repository
 
         public ILikesRepository Likes { get; private set; }
 
+        public ICompanySettingsRepository CompanySettings { get; private set; }
+
+
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -37,6 +40,7 @@ namespace ECommerce.Data.Repository
             ShippingAddress = new ShippingAddressRepositoy(_db);
             OrderItemStatus = new OrderItemStatusRepository(_db);
             Likes = new LikesRepository(_db);
+            CompanySettings = new CompanySettingsRepository(_db);
         }
         public void Save()
         {

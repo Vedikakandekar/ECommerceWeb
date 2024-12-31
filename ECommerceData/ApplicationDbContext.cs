@@ -21,6 +21,7 @@ namespace ECommerce.Data
         public DbSet<OrderItemStatus> OrderItemStatus { get; set; }
 
         public DbSet<Likes> Likes { get; set; }
+        public DbSet<CompanySettings> CompanySettings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,7 +36,6 @@ namespace ECommerce.Data
                 .WithMany(c => c.CartItems)
                 .HasForeignKey(ci => ci.CartId)
                 .OnDelete(DeleteBehavior.Cascade);
-
 
             modelBuilder.Entity<CartItem>()
                 .HasOne(ci => ci.Product)
@@ -70,16 +70,22 @@ namespace ECommerce.Data
                 .HasForeignKey(l => l.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<CompanySettings>().HasData(
+                 new CompanySettings { Id = 1, Name = "FeatureA", Value = "11" },
+                 new CompanySettings { Id = 2, Name = "FeatureB", Value = "stringValue" },
+                 new CompanySettings { Id = 3, Name = "FeatureC", Value = "11.5" }
+                );
+
             modelBuilder.Entity<Category>().HasData(
-                    new Category { Id = 1, Name = "Clothing-Mens", Description = "Explore the Clothing Section curated exclusively for Men.." },
-                    new Category { Id = 2, Name = "Home Decor", Description = "Make your house a home with us.." },
-                    new Category { Id = 3, Name = "Storage", Description = "No Space but a lot of things ? Explore Storage section to make Living spacious.." },
-                new Category { Id = 4, Name = "Electronics", Description = "All Your Electric stuff goes here...check out latest innovations .." });
+                 new Category { Id = 1, Name = "Clothing-Mens", Description = "Explore the Clothing Section curated exclusively for Men.." },
+                 new Category { Id = 2, Name = "Home Decor", Description = "Make your house a home with us.." },
+                 new Category { Id = 3, Name = "Storage", Description = "No Space but a lot of things ? Explore Storage section to make Living spacious.." },
+                 new Category { Id = 4, Name = "Electronics", Description = "All Your Electric stuff goes here...check out latest innovations .." });
             modelBuilder.Entity<Products>().HasData(
 
-            new Products { Id = 1, Name = "TV", Description = "60Inch", Price = 50000, stock = 10, CategoryId = 4, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" },
-            new Products { Id = 2, Name = "Laptop", Description = "i10", Price = 50000, stock = 20, CategoryId = 4, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" },
-            new Products { Id = 3, Name = "TShirt", Description = "Black Tshirt", Price = 1000, stock = 100, CategoryId = 1, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" });
+                new Products { Id = 1, Name = "TV", Description = "60Inch", Price = 50000, stock = 10, CategoryId = 4, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" },
+                new Products { Id = 2, Name = "Laptop", Description = "i10", Price = 50000, stock = 20, CategoryId = 4, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" },
+                new Products { Id = 3, Name = "TShirt", Description = "Black Tshirt", Price = 1000, stock = 100, CategoryId = 1, ImageUrl = "", SellerId = "f300ff54-1b2e-43f9-a700-b04ff20d6153" });
         }
     }
 }
